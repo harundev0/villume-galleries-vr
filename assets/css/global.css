@@ -1465,8 +1465,7 @@ body.immersive-home .spatial-bottom-dock {
 
 /* Fade In Utility for GSAP */
 .fade-up {
-  opacity: 0;
-  visibility: hidden;
+  opacity: 1;
 }
 
 /* Help Document Card Styles */

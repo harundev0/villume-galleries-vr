@@ -356,55 +356,80 @@
       background: #5d5d65;
     }
 
-    /* 4x2 Thumbnail Grid */
+    /* 4x2 Media Card Grid matching Dashboard component */
     .grid-artworks-8 {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
+      gap: 12px;
       margin-top: 10px;
     }
 
-    .thumb-card-item {
-      background: #161619;
-      border-radius: 4px;
-      overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.06);
+    .grid-artworks-8 .media-card {
+      padding: 8px;
+      gap: 8px;
+      background: rgba(28, 28, 34, 0.7);
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
       cursor: pointer;
-      transition: transform 0.2s ease, border-color 0.2s ease;
-      text-decoration: none;
-      color: inherit;
+      transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
       display: flex;
       flex-direction: column;
     }
 
-    .thumb-card-item:hover {
-      transform: translateY(-2px);
+    .grid-artworks-8 .media-card:hover {
+      transform: translateY(-3px);
       border-color: var(--villume-blue);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
     }
 
-    .thumb-img-wrap {
+    .grid-artworks-8 .media-img-wrap {
       width: 100%;
-      aspect-ratio: 4 / 3;
+      aspect-ratio: 16 / 10;
+      border-radius: 6px;
       overflow: hidden;
-      background: #0f0f11;
+      background: #111;
+      position: relative;
     }
 
-    .thumb-img-wrap img {
+    .grid-artworks-8 .media-img-wrap img {
       width: 100%;
       height: 100%;
       object-fit: cover;
       display: block;
+      transition: transform 0.35s ease;
     }
 
-    .thumb-caption {
-      padding: 7px 8px;
-      background: #1c1c20;
-      font-size: 11.5px;
-      font-weight: 500;
-      color: #d1d1d6;
+    .grid-artworks-8 .media-card:hover .media-img-wrap img {
+      transform: scale(1.06);
+    }
+
+    .grid-artworks-8 .media-info {
+      padding: 2px 2px 4px 2px;
+    }
+
+    .grid-artworks-8 .media-title {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #ffffff;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      display: block;
+    }
+
+    body[data-theme="light"] .grid-artworks-8 .media-card {
+      background: #ffffff !important;
+      border: 1px solid rgba(0, 0, 0, 0.08) !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+    }
+
+    body[data-theme="light"] .grid-artworks-8 .media-card:hover {
+      border-color: var(--villume-blue) !important;
+      box-shadow: 0 6px 18px rgba(64, 118, 245, 0.2) !important;
+    }
+
+    body[data-theme="light"] .grid-artworks-8 .media-title {
+      color: #0f172a !important;
     }
 
     /* Screen 3: Artwork Inspection Card ("galiry page") */
@@ -953,37 +978,37 @@
         <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 16px; margin-bottom: 8px;">
         <div class="card-section-label" style="font-size: 13.5px; font-weight: 600; margin-bottom: 10px;">List of Artwork</div>
           <div class="grid-artworks-8">
-            <div class="thumb-card-item" onclick="switchShowcaseScreen(3)">
-              <div class="thumb-img-wrap"><img src="assets/images/gallery-dark-valleys-1.png" alt="The Studio Is Openi.."></div>
-              <div class="thumb-caption">The Studio Is Openi..</div>
+            <div class="media-card" onclick="switchShowcaseScreen(3)">
+              <div class="media-img-wrap"><img src="assets/images/gallery-dark-valleys-1.png" alt="The Studio Is Opening"></div>
+              <div class="media-info"><span class="media-title">The Studio Is Opening</span></div>
             </div>
-            <div class="thumb-card-item" onclick="switchShowcaseScreen(3)">
-              <div class="thumb-img-wrap"><img src="assets/images/gallery-dark-valleys-2.png" alt="Dark Valleys"></div>
-              <div class="thumb-caption">Dark Valleys</div>
+            <div class="media-card" onclick="switchShowcaseScreen(3)">
+              <div class="media-img-wrap"><img src="assets/images/gallery-dark-valleys-2.png" alt="Dark Valleys"></div>
+              <div class="media-info"><span class="media-title">Dark Valleys</span></div>
             </div>
-            <div class="thumb-card-item" onclick="switchShowcaseScreen(3)">
-              <div class="thumb-img-wrap"><img src="assets/images/gallery-dark-valleys-3.png" alt="From Stone to Silic..."></div>
-              <div class="thumb-caption">From Stone to Silic...</div>
+            <div class="media-card" onclick="switchShowcaseScreen(3)">
+              <div class="media-img-wrap"><img src="assets/images/gallery-dark-valleys-3.png" alt="From Stone to Silicone"></div>
+              <div class="media-info"><span class="media-title">From Stone to Silicone</span></div>
             </div>
-            <div class="thumb-card-item" onclick="switchShowcaseScreen(3)">
-              <div class="thumb-img-wrap"><img src="assets/images/gallery-dark-valleys-4.png" alt="Stranded"></div>
-              <div class="thumb-caption">Stranded</div>
+            <div class="media-card" onclick="switchShowcaseScreen(3)">
+              <div class="media-img-wrap"><img src="assets/images/gallery-dark-valleys-4.png" alt="Stranded"></div>
+              <div class="media-info"><span class="media-title">Stranded</span></div>
             </div>
-            <div class="thumb-card-item" onclick="switchShowcaseScreen(3)">
-              <div class="thumb-img-wrap"><img src="assets/images/gallery-dark-valleys-1.png" alt="The Studio Is Openi.."></div>
-              <div class="thumb-caption">The Studio Is Openi..</div>
+            <div class="media-card" onclick="switchShowcaseScreen(3)">
+              <div class="media-img-wrap"><img src="assets/images/gallery-dark-valleys-1.png" alt="The Studio Is Opening"></div>
+              <div class="media-info"><span class="media-title">The Studio Is Opening</span></div>
             </div>
-            <div class="thumb-card-item" onclick="switchShowcaseScreen(3)">
-              <div class="thumb-img-wrap"><img src="assets/images/gallery-dark-valleys-2.png" alt="Dark Valleys"></div>
-              <div class="thumb-caption">Dark Valleys</div>
+            <div class="media-card" onclick="switchShowcaseScreen(3)">
+              <div class="media-img-wrap"><img src="assets/images/gallery-dark-valleys-2.png" alt="Dark Valleys"></div>
+              <div class="media-info"><span class="media-title">Dark Valleys</span></div>
             </div>
-            <div class="thumb-card-item" onclick="switchShowcaseScreen(3)">
-              <div class="thumb-img-wrap"><img src="assets/images/gallery-dark-valleys-3.png" alt="From Stone to Silic..."></div>
-              <div class="thumb-caption">From Stone to Silic...</div>
+            <div class="media-card" onclick="switchShowcaseScreen(3)">
+              <div class="media-img-wrap"><img src="assets/images/gallery-dark-valleys-3.png" alt="From Stone to Silicone"></div>
+              <div class="media-info"><span class="media-title">From Stone to Silicone</span></div>
             </div>
-            <div class="thumb-card-item" onclick="switchShowcaseScreen(3)">
-              <div class="thumb-img-wrap"><img src="assets/images/gallery-dark-valleys-4.png" alt="Stranded"></div>
-              <div class="thumb-caption">Stranded</div>
+            <div class="media-card" onclick="switchShowcaseScreen(3)">
+              <div class="media-img-wrap"><img src="assets/images/gallery-dark-valleys-4.png" alt="Stranded"></div>
+              <div class="media-info"><span class="media-title">Stranded</span></div>
             </div>
           </div>
         </div>
@@ -1019,37 +1044,37 @@
         <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 16px; margin-bottom: 8px;">
           <div class="card-section-label" style="font-size: 13.5px; font-weight: 600; margin-bottom: 10px;">Galleries</div>
           <div class="grid-artworks-8">
-            <div class="thumb-card-item" onclick="switchShowcaseScreen(3)">
-              <div class="thumb-img-wrap"><img src="assets/images/gallery-dark-valleys-1.png" alt="The Studio Is Openi.."></div>
-              <div class="thumb-caption">The Studio Is Openi..</div>
+            <div class="media-card" onclick="switchShowcaseScreen(3)">
+              <div class="media-img-wrap"><img src="assets/images/gallery-dark-valleys-1.png" alt="The Studio Is Opening"></div>
+              <div class="media-info"><span class="media-title">The Studio Is Opening</span></div>
             </div>
-            <div class="thumb-card-item" onclick="switchShowcaseScreen(3)">
-              <div class="thumb-img-wrap"><img src="assets/images/gallery-dark-valleys-2.png" alt="Dark Valleys"></div>
-              <div class="thumb-caption">Dark Valleys</div>
+            <div class="media-card" onclick="switchShowcaseScreen(3)">
+              <div class="media-img-wrap"><img src="assets/images/gallery-dark-valleys-2.png" alt="Dark Valleys"></div>
+              <div class="media-info"><span class="media-title">Dark Valleys</span></div>
             </div>
-            <div class="thumb-card-item" onclick="switchShowcaseScreen(3)">
-              <div class="thumb-img-wrap"><img src="assets/images/gallery-dark-valleys-3.png" alt="From Stone to Silic..."></div>
-              <div class="thumb-caption">From Stone to Silic...</div>
+            <div class="media-card" onclick="switchShowcaseScreen(3)">
+              <div class="media-img-wrap"><img src="assets/images/gallery-dark-valleys-3.png" alt="From Stone to Silicone"></div>
+              <div class="media-info"><span class="media-title">From Stone to Silicone</span></div>
             </div>
-            <div class="thumb-card-item" onclick="switchShowcaseScreen(3)">
-              <div class="thumb-img-wrap"><img src="assets/images/gallery-dark-valleys-4.png" alt="Stranded"></div>
-              <div class="thumb-caption">Stranded</div>
+            <div class="media-card" onclick="switchShowcaseScreen(3)">
+              <div class="media-img-wrap"><img src="assets/images/gallery-dark-valleys-4.png" alt="Stranded"></div>
+              <div class="media-info"><span class="media-title">Stranded</span></div>
             </div>
-            <div class="thumb-card-item" onclick="switchShowcaseScreen(3)">
-              <div class="thumb-img-wrap"><img src="assets/images/gallery-dark-valleys-1.png" alt="The Studio Is Openi.."></div>
-              <div class="thumb-caption">The Studio Is Openi..</div>
+            <div class="media-card" onclick="switchShowcaseScreen(3)">
+              <div class="media-img-wrap"><img src="assets/images/gallery-dark-valleys-1.png" alt="The Studio Is Opening"></div>
+              <div class="media-info"><span class="media-title">The Studio Is Opening</span></div>
             </div>
-            <div class="thumb-card-item" onclick="switchShowcaseScreen(3)">
-              <div class="thumb-img-wrap"><img src="assets/images/gallery-dark-valleys-2.png" alt="Dark Valleys"></div>
-              <div class="thumb-caption">Dark Valleys</div>
+            <div class="media-card" onclick="switchShowcaseScreen(3)">
+              <div class="media-img-wrap"><img src="assets/images/gallery-dark-valleys-2.png" alt="Dark Valleys"></div>
+              <div class="media-info"><span class="media-title">Dark Valleys</span></div>
             </div>
-            <div class="thumb-card-item" onclick="switchShowcaseScreen(3)">
-              <div class="thumb-img-wrap"><img src="assets/images/gallery-dark-valleys-3.png" alt="From Stone to Silic..."></div>
-              <div class="thumb-caption">From Stone to Silic...</div>
+            <div class="media-card" onclick="switchShowcaseScreen(3)">
+              <div class="media-img-wrap"><img src="assets/images/gallery-dark-valleys-3.png" alt="From Stone to Silicone"></div>
+              <div class="media-info"><span class="media-title">From Stone to Silicone</span></div>
             </div>
-            <div class="thumb-card-item" onclick="switchShowcaseScreen(3)">
-              <div class="thumb-img-wrap"><img src="assets/images/gallery-dark-valleys-4.png" alt="Stranded"></div>
-              <div class="thumb-caption">Stranded</div>
+            <div class="media-card" onclick="switchShowcaseScreen(3)">
+              <div class="media-img-wrap"><img src="assets/images/gallery-dark-valleys-4.png" alt="Stranded"></div>
+              <div class="media-info"><span class="media-title">Stranded</span></div>
             </div>
           </div>
         </div>
