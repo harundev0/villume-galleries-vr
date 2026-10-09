@@ -805,32 +805,90 @@
                   </div>
                 </div>
 
-                <!-- LANGUAGE SETTINGS TAB -->
+                <!-- LANGUAGE SETTINGS TAB (MATCHING REFERENCE IMAGE 1) -->
                 <div id="setting-tab-language" style="display: none; flex-direction: column; gap: 16px; width: 100%;">
-                  <div class="help-info-card" style="padding: 24px 28px; background: rgba(22, 22, 28, 0.7); display: flex; flex-direction: column; align-items: stretch; text-align: left;">
-                    <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">Interface Language</div>
-                    <p style="font-size: 13.5px; color: var(--muted-foreground); margin-bottom: 20px;">
-                      Select your preferred language for menus, artwork details, and navigation guides.
-                    </p>
-
-                    <div style="display: flex; flex-direction: column; gap: 12px;">
-                      <label class="setting-radio-label" style="background: rgba(255,255,255,0.04); padding: 12px 18px; border-radius: var(--radius-md);">
-                        <input type="radio" name="setting-lang" value="en" checked onchange="showToast('Language: English')">
-                        <span>English (United States) <span style="font-size: 11px; color: var(--muted-foreground); margin-left: 6px;">(Default)</span></span>
-                      </label>
-                      <label class="setting-radio-label" style="background: rgba(255,255,255,0.04); padding: 12px 18px; border-radius: var(--radius-md);">
-                        <input type="radio" name="setting-lang" value="id" onchange="showToast('Bahasa: Bahasa Indonesia')">
-                        <span>Bahasa Indonesia</span>
-                      </label>
-                      <label class="setting-radio-label" style="background: rgba(255,255,255,0.04); padding: 12px 18px; border-radius: var(--radius-md);">
-                        <input type="radio" name="setting-lang" value="ja" onchange="showToast('言語: 日本語')">
-                        <span>日本語 (Japanese)</span>
-                      </label>
-                      <label class="setting-radio-label" style="background: rgba(255,255,255,0.04); padding: 12px 18px; border-radius: var(--radius-md);">
-                        <input type="radio" name="setting-lang" value="de" onchange="showToast('Sprache: Deutsch')">
-                        <span>Deutsch (German)</span>
-                      </label>
+                  <div class="help-info-card" style="padding: 24px; background: rgba(22, 22, 28, 0.7); display: flex; flex-direction: column; gap: 18px; text-align: left;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                      <div>
+                        <div style="font-size: 16px; font-weight: 600; color: #ffffff;">Language</div>
+                        <div style="font-size: 13px; color: var(--muted-foreground); margin-top: 2px;">Select your preferred interface language</div>
+                      </div>
+                      <span id="current-lang-indicator" style="background: rgba(255, 199, 0, 0.15); color: #FFC700; border: 1px solid rgba(255, 199, 0, 0.3); font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 16px;">English</span>
                     </div>
+
+                    <!-- 15 Languages Grid matching Image 1 -->
+                    <div class="lang-grid">
+                      <!-- Row 1 -->
+                      <button class="lang-btn active" data-lang="en" onclick="selectLanguage('en', 'English', this)">
+                        <img src="assets/flag/flag-english.png" alt="English" class="lang-flag-icon">
+                        <span>English</span>
+                      </button>
+                      <button class="lang-btn" data-lang="da" onclick="selectLanguage('da', 'Dansk', this)">
+                        <img src="assets/flag/flag-dansk.png" alt="Dansk" class="lang-flag-icon">
+                        <span>Dansk</span>
+                      </button>
+                      <button class="lang-btn" data-lang="fr" onclick="selectLanguage('fr', 'Français', this)">
+                        <img src="assets/flag/flag-francais.png" alt="Français" class="lang-flag-icon">
+                        <span>Français</span>
+                      </button>
+
+                      <!-- Row 2 -->
+                      <button class="lang-btn" data-lang="ro" onclick="selectLanguage('ro', 'Română', this)">
+                        <img src="assets/flag/flag-romana.png" alt="Română" class="lang-flag-icon">
+                        <span>Română</span>
+                      </button>
+                      <button class="lang-btn" data-lang="pl" onclick="selectLanguage('pl', 'Polski', this)">
+                        <img src="assets/flag/flag-polski.png" alt="Polski" class="lang-flag-icon">
+                        <span>Polski</span>
+                      </button>
+                      <button class="lang-btn" data-lang="sk" onclick="selectLanguage('sk', 'Slovenčina', this)">
+                        <img src="assets/flag/flag-slovencina.png" alt="Slovenčina" class="lang-flag-icon">
+                        <span>Slovenčina</span>
+                      </button>
+
+                      <!-- Row 3 -->
+                      <button class="lang-btn" data-lang="es" onclick="selectLanguage('es', 'Español', this)">
+                        <img src="assets/flag/flag-espanol.png" alt="Español" class="lang-flag-icon">
+                        <span>Español</span>
+                      </button>
+                      <button class="lang-btn" data-lang="zh" onclick="selectLanguage('zh', '简体中文', this)">
+                        <img src="assets/flag/flag-chinese.png" alt="简体中文" class="lang-flag-icon">
+                        <span>简体中文</span>
+                      </button>
+                      <button class="lang-btn" data-lang="de" onclick="selectLanguage('de', 'Deutsch', this)">
+                        <img src="assets/flag/flag-deutsch.png" alt="Deutsch" class="lang-flag-icon">
+                        <span>Deutsch</span>
+                      </button>
+
+                      <!-- Row 4 -->
+                      <button class="lang-btn" data-lang="ru" onclick="selectLanguage('ru', 'Русский', this)">
+                        <img src="assets/flag/flag-russian.png" alt="Русский" class="lang-flag-icon">
+                        <span>Русский</span>
+                      </button>
+                      <button class="lang-btn" data-lang="ja" onclick="selectLanguage('ja', '日本語', this)">
+                        <img src="assets/flag/flag-japanese.png" alt="日本語" class="lang-flag-icon">
+                        <span>日本語</span>
+                      </button>
+                      <button class="lang-btn" data-lang="it" onclick="selectLanguage('it', 'Italiano', this)">
+                        <img src="assets/flag/flag-italiano.png" alt="Italiano" class="lang-flag-icon">
+                        <span>Italiano</span>
+                      </button>
+
+                      <!-- Row 5 -->
+                      <button class="lang-btn" data-lang="nl" onclick="selectLanguage('nl', 'Nederlands', this)">
+                        <img src="assets/flag/flag-nederlands.png" alt="Nederlands" class="lang-flag-icon">
+                        <span>Nederlands</span>
+                      </button>
+                      <button class="lang-btn" data-lang="sv" onclick="selectLanguage('sv', 'Svenska', this)">
+                        <img src="assets/flag/flag-svenska.png" alt="Svenska" class="lang-flag-icon">
+                        <span>Svenska</span>
+                      </button>
+                      <button class="lang-btn" data-lang="pt" onclick="selectLanguage('pt', 'Português', this)">
+                        <img src="assets/flag/flag-portugues.png" alt="Português" class="lang-flag-icon">
+                        <span>Português</span>
+                      </button>
+                    </div>
+
                   </div>
                 </div>
 
@@ -926,31 +984,84 @@
             </div>
           </div>
 
-          <!-- LANGUAGE SETTINGS TAB -->
+          <!-- LANGUAGE SETTINGS TAB (MATCHING REFERENCE IMAGE 1) -->
           <div id="setting-panel-language" style="display: none; flex-direction: column; gap: 18px; width: 100%;">
-            <div class="setting-controls-card" style="align-items: stretch; text-align: left;">
-              <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 14px;">Display & Interface Language</h3>
-              <p style="font-size: 13.5px; color: var(--muted-foreground); margin-bottom: 20px;">
-                Choose your preferred language for the Villume VR interface, artwork descriptions, and guides.
-              </p>
+            <div class="setting-controls-card" style="align-items: stretch; text-align: left; padding: 20px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3 style="font-size: 16px; font-weight: 600; margin: 0;">Language</h3>
+                <span class="active-lang-badge" id="modal-current-lang-indicator" style="background: rgba(255, 199, 0, 0.15); color: #FFC700; border: 1px solid rgba(255, 199, 0, 0.3); font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 12px;">English</span>
+              </div>
               
-              <div style="display: flex; flex-direction: column; gap: 12px;">
-                <label class="setting-radio-label" style="background: rgba(255,255,255,0.04); padding: 12px 16px; border-radius: 8px;">
-                  <input type="radio" name="lang-choice" value="en" checked onchange="showToast('Language: English')">
-                  <span>English (United States) <span style="font-size: 12px; color: var(--muted-foreground); margin-left: 8px;">Default</span></span>
-                </label>
-                <label class="setting-radio-label" style="background: rgba(255,255,255,0.04); padding: 12px 16px; border-radius: 8px;">
-                  <input type="radio" name="lang-choice" value="id" onchange="showToast('Bahasa: Bahasa Indonesia')">
-                  <span>Bahasa Indonesia</span>
-                </label>
-                <label class="setting-radio-label" style="background: rgba(255,255,255,0.04); padding: 12px 16px; border-radius: 8px;">
-                  <input type="radio" name="lang-choice" value="ja" onchange="showToast('言語: 日本語')">
-                  <span>日本語 (Japanese)</span>
-                </label>
-                <label class="setting-radio-label" style="background: rgba(255,255,255,0.04); padding: 12px 16px; border-radius: 8px;">
-                  <input type="radio" name="lang-choice" value="de" onchange="showToast('Sprache: Deutsch')">
-                  <span>Deutsch (German)</span>
-                </label>
+              <div class="lang-grid">
+                <!-- Row 1 -->
+                <button class="lang-btn active" data-lang="en" onclick="selectLanguage('en', 'English', this)">
+                  <img src="assets/flag/flag-english.png" alt="English" class="lang-flag-icon">
+                  <span>English</span>
+                </button>
+                <button class="lang-btn" data-lang="da" onclick="selectLanguage('da', 'Dansk', this)">
+                  <img src="assets/flag/flag-dansk.png" alt="Dansk" class="lang-flag-icon">
+                  <span>Dansk</span>
+                </button>
+                <button class="lang-btn" data-lang="fr" onclick="selectLanguage('fr', 'Français', this)">
+                  <img src="assets/flag/flag-francais.png" alt="Français" class="lang-flag-icon">
+                  <span>Français</span>
+                </button>
+
+                <!-- Row 2 -->
+                <button class="lang-btn" data-lang="ro" onclick="selectLanguage('ro', 'Română', this)">
+                  <img src="assets/flag/flag-romana.png" alt="Română" class="lang-flag-icon">
+                  <span>Română</span>
+                </button>
+                <button class="lang-btn" data-lang="pl" onclick="selectLanguage('pl', 'Polski', this)">
+                  <img src="assets/flag/flag-polski.png" alt="Polski" class="lang-flag-icon">
+                  <span>Polski</span>
+                </button>
+                <button class="lang-btn" data-lang="sk" onclick="selectLanguage('sk', 'Slovenčina', this)">
+                  <img src="assets/flag/flag-slovencina.png" alt="Slovenčina" class="lang-flag-icon">
+                  <span>Slovenčina</span>
+                </button>
+
+                <!-- Row 3 -->
+                <button class="lang-btn" data-lang="es" onclick="selectLanguage('es', 'Español', this)">
+                  <img src="assets/flag/flag-espanol.png" alt="Español" class="lang-flag-icon">
+                  <span>Español</span>
+                </button>
+                <button class="lang-btn" data-lang="zh" onclick="selectLanguage('zh', '简体中文', this)">
+                  <img src="assets/flag/flag-chinese.png" alt="简体中文" class="lang-flag-icon">
+                  <span>简体中文</span>
+                </button>
+                <button class="lang-btn" data-lang="de" onclick="selectLanguage('de', 'Deutsch', this)">
+                  <img src="assets/flag/flag-deutsch.png" alt="Deutsch" class="lang-flag-icon">
+                  <span>Deutsch</span>
+                </button>
+
+                <!-- Row 4 -->
+                <button class="lang-btn" data-lang="ru" onclick="selectLanguage('ru', 'Русский', this)">
+                  <img src="assets/flag/flag-russian.png" alt="Русский" class="lang-flag-icon">
+                  <span>Русский</span>
+                </button>
+                <button class="lang-btn" data-lang="ja" onclick="selectLanguage('ja', '日本語', this)">
+                  <img src="assets/flag/flag-japanese.png" alt="日本語" class="lang-flag-icon">
+                  <span>日本語</span>
+                </button>
+                <button class="lang-btn" data-lang="it" onclick="selectLanguage('it', 'Italiano', this)">
+                  <img src="assets/flag/flag-italiano.png" alt="Italiano" class="lang-flag-icon">
+                  <span>Italiano</span>
+                </button>
+
+                <!-- Row 5 -->
+                <button class="lang-btn" data-lang="nl" onclick="selectLanguage('nl', 'Nederlands', this)">
+                  <img src="assets/flag/flag-nederlands.png" alt="Nederlands" class="lang-flag-icon">
+                  <span>Nederlands</span>
+                </button>
+                <button class="lang-btn" data-lang="sv" onclick="selectLanguage('sv', 'Svenska', this)">
+                  <img src="assets/flag/flag-svenska.png" alt="Svenska" class="lang-flag-icon">
+                  <span>Svenska</span>
+                </button>
+                <button class="lang-btn" data-lang="pt" onclick="selectLanguage('pt', 'Português', this)">
+                  <img src="assets/flag/flag-portugues.png" alt="Português" class="lang-flag-icon">
+                  <span>Português</span>
+                </button>
               </div>
             </div>
           </div>
@@ -1786,6 +1897,27 @@
         if (navTab) navTab.style.display = 'none';
         if (langTab) langTab.style.display = 'flex';
       }
+    }
+
+    // Language Selection matching Image 1
+    let currentLanguage = 'en';
+    function selectLanguage(langKey, langName, el) {
+      currentLanguage = langKey;
+      
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        if (btn.getAttribute('data-lang') === langKey) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      const indicator = document.getElementById('current-lang-indicator');
+      if (indicator) indicator.textContent = langName;
+      const modalIndicator = document.getElementById('modal-current-lang-indicator');
+      if (modalIndicator) modalIndicator.textContent = langName;
+
+      showToast('Language changed to ' + langName);
     }
 
     // Settings Modal Handlers

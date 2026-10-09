@@ -1184,6 +1184,66 @@ body.immersive-home .spatial-bottom-dock {
   margin: 0;
 }
 
+/* Language Selection Grid (Vision Pro / Reference Layout) */
+.lang-grid-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.lang-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px 14px;
+  width: 100%;
+}
+
+.lang-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  padding: 10px 16px;
+  min-height: 48px;
+  border-radius: 10px;
+  color: #f5f5f7;
+  font-size: 14.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: inherit;
+  text-align: left;
+  user-select: none;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.lang-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+  color: #ffffff;
+}
+
+.lang-btn.active {
+  background: #FFC700 !important;
+  color: #101012 !important;
+  font-weight: 700 !important;
+  border-color: #FFC700 !important;
+  box-shadow: 0 4px 14px rgba(255, 199, 0, 0.32);
+}
+
+.lang-flag-icon {
+  width: 26px;
+  height: 26px;
+  min-width: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+  flex-shrink: 0;
+}
+
 /* Standalone Controller Modal */
 .nav-modal-backdrop {
   position: fixed;
