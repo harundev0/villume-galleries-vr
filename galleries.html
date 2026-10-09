@@ -1936,10 +1936,7 @@
       }
 
       const hash = window.location.hash.replace('#', '');
-      if (hash === 'settings') {
-        switchView('galleries');
-        openSettingsModal();
-      } else if (hash && ['home', 'galleries', 'artists', 'artist-detail', 'help'].includes(hash)) {
+      if (hash && ['home', 'galleries', 'artists', 'artist-detail', 'help', 'settings'].includes(hash)) {
         switchView(hash);
       } else {
         switchView('galleries');
