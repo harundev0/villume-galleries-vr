@@ -4,24 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Artist Profile - Villume VR</title>
-  <link href="assets/css/global.css" rel="stylesheet">
+  <link href="assets/css/global.css?v=5" rel="stylesheet">
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <style>
-    .creator-contact {
-      display: flex;
-      gap: 24px;
-      font-size: 15px;
-      color: var(--muted-foreground);
-      font-weight: 500;
-      flex-wrap: wrap;
-      margin-top: 16px;
-      margin-bottom: 24px;
-    }
-    .creator-contact span {
-      display: flex;
-      align-items: center;
-      gap: 8px;
+    .board-header .board-title {
+      font-size: 20px;
+      font-weight: 600;
     }
   </style>
 </head>
@@ -49,109 +38,127 @@
         <header class="board-header">
           <div class="header-left">
             <div class="window-controls">
-              <div class="win-dot"></div>
-              <div class="win-dot"></div>
-              <div class="win-dot"></div>
+              <div class="win-dot" style="background:#ff5f56;"></div>
+              <div class="win-dot" style="background:#ffbd2e;"></div>
+              <div class="win-dot" style="background:#27c93f;"></div>
             </div>
             <a href="artists.html" class="back-nav" style="margin-bottom: 0;">
               <i class="ph ph-caret-left"></i> Back to Artists
             </a>
           </div>
           
-          <button class="nav-item" style="border-radius:var(--radius-full); width:40px; height:40px;" title="Options">
-            <i class="ph ph-dots-three"></i>
-          </button>
+          <div class="header-search" style="border-radius: var(--radius-full);">
+            <i class="ph ph-magnifying-glass"></i>
+            <input type="text" id="search-input" placeholder="Search artist...">
+          </div>
         </header>
 
         <div class="board-content">
           
-          <div class="detail-hero stagger-item">
-            <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=500&q=80" alt="Esther Howard" class="detail-cover">
+          <!-- TOP PROFILE CARD (Premium Apple Vision Pro Glassmorphism) -->
+          <div class="detail-hero-premium stagger-item">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80" alt="Esther Howard" class="detail-hero-avatar">
             
-            <div class="detail-info">
-              <h1 class="detail-name">Esther Howard</h1>
-              <div class="detail-tags">
-                <span class="tag">@esther_howard</span>
+            <div class="detail-hero-content">
+              <h1 class="detail-hero-name">Esther Howard</h1>
+              
+              <div class="detail-hero-meta">
+                <span class="detail-hero-username">esther_howard</span>
+                <div class="detail-hero-socials">
+                  <a href="#" class="detail-social-btn" aria-label="Facebook"><i class="ph-fill ph-facebook-logo"></i></a>
+                  <a href="#" class="detail-social-btn" aria-label="Instagram"><i class="ph ph-instagram-logo"></i></a>
+                  <a href="#" class="detail-social-btn" aria-label="Website"><i class="ph ph-globe"></i></a>
+                </div>
               </div>
 
-              <!-- EXACT Contact details restored -->
-              <div class="creator-contact">
-                <span>
-                  <i class="ph ph-map-pin"></i> Subang, West Java, Indonesia
-                </span>
-                <span>
-                  <i class="ph ph-envelope-simple"></i> johndoe@gmail.com
-                </span>
+              <div class="detail-hero-contact">
+                <span>Subang, West Java, Indonesia</span>
+                <span>johndoe@gmail.com</span>
               </div>
               
-              <!-- EXACT Bio restored -->
-              <p class="detail-bio">
-                Lorem ipsum dolor sit amet, consec tetur adipiscing elit. Vivamus efficitur est ex, nec bibendum erat semper in. Ut hendrerit porta ex vitae elem entum. Vestibulum condimentum mauris non leo varius elementum. Donec sed ultricies tellus. Duis eget urna nec urna consectetur malesuada in id ipsum 
+              <p class="detail-hero-bio">
+                Lorem ipsum dolor sit amet, consec tetur adipiscing elit. Vivamus efficitur est ex, nec bibendum erat semper in. Ut hendrerit porta ex vitae elem entum. Vestibulum condimentum mauris non leo varius elementum. Donec sed ultricies tellus. Duis eget urna nec urna consectetur malesuada in id ipsum <span class="show-more-link">Show more &darr;</span>
               </p>
-              
-              <div style="margin-top: 32px; display: flex; gap: 16px;">
-                <a href="#" class="btn-primary">Message</a>
-                <a href="#" class="nav-item" style="background:var(--muted); border-radius: var(--radius-full);" aria-label="Facebook"><i class="ph ph-facebook-logo"></i></a>
-                <a href="#" class="nav-item" style="background:var(--muted); border-radius: var(--radius-full);" aria-label="Instagram"><i class="ph ph-instagram-logo"></i></a>
-                <a href="#" class="nav-item" style="background:var(--muted); border-radius: var(--radius-full);" aria-label="Website"><i class="ph ph-globe"></i></a>
-              </div>
             </div>
           </div>
 
-          <h2 class="section-title stagger-item">Virtual Exhibitions</h2>
-          
-          <!-- Exact 4 cards restored -->
-          <div class="master-grid">
-            
-            <a href="prototype.html" style="text-decoration: none; color: inherit;">
-              <div class="media-card stagger-item">
-                <div class="media-img-wrap">
-                  <img src="https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=600&q=80" alt="Gallery" />
-                </div>
-                <div class="media-info">
-                  <span class="media-title">Esther Howard</span>
-                  <span class="media-sub">Dark Valley</span>
-                </div>
+          <!-- 8 ARTWORK CARDS (4 COLUMNS X 2 ROWS - Premium Media Cards) -->
+          <div class="artworks-grid-4col">
+            <!-- Row 1 -->
+            <a href="prototype.html" class="media-card stagger-item">
+              <div class="media-img-wrap">
+                <img src="assets/images/gallery-dark-valleys-1.png" alt="The Studio Is Opening">
               </div>
-            </a>
-            
-            <a href="prototype.html" style="text-decoration: none; color: inherit;">
-              <div class="media-card stagger-item">
-                <div class="media-img-wrap">
-                  <img src="https://images.unsplash.com/photo-1577083288073-40892c0860a4?auto=format&fit=crop&w=600&q=80" alt="Gallery" />
-                </div>
-                <div class="media-info">
-                  <span class="media-title">Esther Howard</span>
-                  <span class="media-sub">Elysium Horizon</span>
-                </div>
+              <div class="media-info">
+                <span class="media-title">The Studio Is Opening</span>
               </div>
             </a>
 
-            <a href="prototype.html" style="text-decoration: none; color: inherit;">
-              <div class="media-card stagger-item">
-                <div class="media-img-wrap">
-                  <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80" alt="Gallery" />
-                </div>
-                <div class="media-info">
-                  <span class="media-title">Esther Howard</span>
-                  <span class="media-sub">Quiet Monochrome</span>
-                </div>
+            <a href="prototype.html" class="media-card stagger-item">
+              <div class="media-img-wrap">
+                <img src="assets/images/gallery-dark-valleys-2.png" alt="Dark Valleys">
+              </div>
+              <div class="media-info">
+                <span class="media-title">Dark Valleys</span>
               </div>
             </a>
 
-            <a href="prototype.html" style="text-decoration: none; color: inherit;">
-              <div class="media-card stagger-item">
-                <div class="media-img-wrap">
-                  <img src="https://images.unsplash.com/photo-1549213821-4708d624e1d1?auto=format&fit=crop&w=600&q=80" alt="Gallery" />
-                </div>
-                <div class="media-info">
-                  <span class="media-title">Esther Howard</span>
-                  <span class="media-sub">Neon Solitude</span>
-                </div>
+            <a href="prototype.html" class="media-card stagger-item">
+              <div class="media-img-wrap">
+                <img src="assets/images/gallery-dark-valleys-3.png" alt="From Stone to Silicone">
+              </div>
+              <div class="media-info">
+                <span class="media-title">From Stone to Silicone</span>
               </div>
             </a>
 
+            <a href="prototype.html" class="media-card stagger-item">
+              <div class="media-img-wrap">
+                <img src="assets/images/gallery-dark-valleys-4.png" alt="Stranded">
+              </div>
+              <div class="media-info">
+                <span class="media-title">Stranded</span>
+              </div>
+            </a>
+
+            <!-- Row 2 -->
+            <a href="prototype.html" class="media-card stagger-item">
+              <div class="media-img-wrap">
+                <img src="assets/images/gallery-dark-valleys-1.png" alt="The Studio Is Opening">
+              </div>
+              <div class="media-info">
+                <span class="media-title">The Studio Is Opening</span>
+              </div>
+            </a>
+
+            <a href="prototype.html" class="media-card stagger-item">
+              <div class="media-img-wrap">
+                <img src="assets/images/gallery-dark-valleys-2.png" alt="Dark Valleys">
+              </div>
+              <div class="media-info">
+                <span class="media-title">Dark Valleys</span>
+              </div>
+            </a>
+
+            <a href="prototype.html" class="media-card stagger-item">
+              <div class="media-img-wrap">
+                <img src="assets/images/gallery-dark-valleys-3.png" alt="From Stone to Silicone">
+              </div>
+              <div class="media-info">
+                <span class="media-title">From Stone to Silicone</span>
+              </div>
+            </a>
+
+            <a href="prototype.html" class="media-card stagger-item">
+              <div class="media-img-wrap">
+                <img src="assets/images/gallery-dark-valleys-4.png" alt="Stranded">
+              </div>
+              <div class="media-info">
+                <span class="media-title">Stranded</span>
+              </div>
+            </a>
           </div>
+
         </div>
       </main>
 

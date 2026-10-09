@@ -3,247 +3,1362 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VR Artwork Preview - Villume VR</title>
-  <link href="assets/css/global.css" rel="stylesheet">
+  <title>Villume VR - Interactive Showcase</title>
+  <link href="assets/css/global.css?v=6" rel="stylesheet">
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <style>
-    .prototype-page {
+    :root {
+      --villume-blue: #4076F5;
+      --villume-blue-hover: #3162d9;
+      --villume-blue-glow: rgba(64, 118, 245, 0.4);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #000;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      user-select: none;
+    }
+
+    /* Fullscreen VR Container */
+    .vr-stage {
       position: relative;
       width: 100vw;
       height: 100vh;
       overflow: hidden;
-      background: #000;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: center;
     }
 
-    .proto-bg-video {
+    /* Backgrounds */
+    .bg-layer {
       position: absolute;
       inset: 0;
       width: 100%;
       height: 100%;
       object-fit: cover;
-      filter: brightness(0.65);
       z-index: 0;
+      transition: opacity 0.4s ease, filter 0.4s ease;
     }
 
-    .top-canvas-overlay {
-      position: absolute;
-      top: 36px;
+    .bg-vr-villa {
+      background-image: url('assets/images/file_2023-09-19_06.21 2.png');
+      background-size: cover;
+      background-position: center;
+    }
+
+    .bg-artwork-wall {
+      background-image: url('assets/images/image 32.png');
+      background-size: cover;
+      background-position: center;
+      background-color: #2b2b2e;
+      display: none;
+    }
+
+    .bg-dollhouse {
+      background-color: #3e3e42;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .dollhouse-img {
+      max-width: 90%;
+      max-height: 80vh;
+      object-fit: contain;
+      filter: drop-shadow(0 20px 40px rgba(0,0,0,0.6));
+      animation: floatDollhouse 6s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatDollhouse {
+      0% { transform: translateY(0px) scale(1); }
+      100% { transform: translateY(-8px) scale(1.01); }
+    }
+
+    /* Top Floating UI Switcher / Inspector */
+    .ui-inspector-bar {
+      position: fixed;
+      top: 14px;
       left: 50%;
       transform: translateX(-50%);
-      background: var(--glass-bg);
-      backdrop-filter: blur(40px) saturate(140%);
-      -webkit-backdrop-filter: blur(40px) saturate(140%);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-lg);
-      padding: 16px 32px;
+      z-index: 1000;
+      background: rgba(18, 18, 22, 0.88);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      padding: 6px 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      max-width: 95vw;
+      overflow-x: auto;
+    }
+
+    .ui-inspector-bar.minimized .inspector-pills {
+      display: none;
+    }
+
+    .inspector-badge {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--villume-blue);
+      padding: 4px 10px;
+      background: rgba(64, 118, 245, 0.12);
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .inspector-pills {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .inspector-pill {
+      background: transparent;
+      border: 1px solid transparent;
+      color: rgba(255, 255, 255, 0.7);
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+
+    .inspector-pill:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+
+    .inspector-pill.active {
+      background: var(--villume-blue);
+      color: #fff;
+      font-weight: 600;
+      box-shadow: 0 4px 14px var(--villume-blue-glow);
+    }
+
+    .inspector-toggle {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #fff;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+    .inspector-toggle:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    /* Modal Windows Styling */
+    .modal-overlay-container {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      pointer-events: none;
+    }
+
+    .modal-window {
+      pointer-events: auto;
+      display: none !important;
+      animation: modalFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .modal-window.active {
+      display: block !important;
+    }
+
+    .modal-window.dialog-confirm-card.active {
+      display: flex !important;
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: translateY(14px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0px) scale(1); }
+    }
+
+    /* Common Card Styles for Modals */
+    .dark-card-panel {
+      background: #1e1e21;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65);
+      color: #fff;
+    }
+
+    /* Screen 1 & Screen 2: Gallery & Creator Cards */
+    .modal-content-card {
+      width: 580px;
+      max-width: 90vw;
+      max-height: calc(100vh - 160px);
+      overflow-y: auto;
+      padding: 24px;
+    }
+
+    .modal-content-card::-webkit-scrollbar {
+      width: 4px;
+    }
+    .modal-content-card::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+    }
+
+    .card-top-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .card-top-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .btn-close-modal {
+      background: transparent;
+      border: none;
+      color: #8e8e93;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+      transition: color 0.2s;
+    }
+    .btn-close-modal:hover {
+      color: #fff;
+    }
+
+    .card-creator-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+
+    .card-creator-avatar {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .card-creator-avatar.sm {
+      width: 24px;
+      height: 24px;
+    }
+
+    .card-social-icons {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .card-social-icons a {
+      color: #fff;
+      opacity: 0.8;
+      font-size: 15px;
+      text-decoration: none;
+      transition: opacity 0.2s, color 0.2s;
+    }
+    .card-social-icons a:hover {
+      opacity: 1;
+      color: var(--villume-blue);
+    }
+
+    .card-body-text {
+      font-size: 13px;
+      color: #b0b0b5;
+      line-height: 1.55;
+      margin-bottom: 20px;
+    }
+
+    .card-body-text .show-more {
+      color: #ffffff;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      margin-left: 4px;
+    }
+
+    /* Share Bar in Screen 1 */
+    .share-section-label {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .share-bar-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .share-input-box {
+      flex: 1;
+      background: #141416;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 12.5px;
+      color: #8e8e93;
+      outline: none;
+      user-select: all;
+    }
+
+    .btn-share-pill {
+      background: #4a4a50;
+      color: #ffffff;
+      border: none;
+      border-radius: 999px;
+      padding: 8px 18px;
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .btn-share-pill:hover {
+      background: #5d5d65;
+    }
+
+    /* 4x2 Thumbnail Grid */
+    .grid-artworks-8 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .thumb-card-item {
+      background: #161619;
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      cursor: pointer;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .thumb-card-item:hover {
+      transform: translateY(-2px);
+      border-color: var(--villume-blue);
+    }
+
+    .thumb-img-wrap {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      overflow: hidden;
+      background: #0f0f11;
+    }
+
+    .thumb-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .thumb-caption {
+      padding: 7px 8px;
+      background: #1c1c20;
+      font-size: 11.5px;
+      font-weight: 500;
+      color: #d1d1d6;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Screen 3: Artwork Inspection Card ("galiry page") */
+    .artwork-inspect-container {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .artwork-inspect-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 1280px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 14vw;
+      pointer-events: none;
+    }
+
+    .artwork-inspect-card {
+      pointer-events: auto;
+      width: 250px;
+      background: rgba(28, 28, 32, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 20px 48px rgba(0, 0, 0, 0.7);
+    }
+
+    .btn-request-art {
+      width: 100%;
+      margin-top: 18px;
+      padding: 10px 0;
+      border-radius: 999px;
+      background: transparent;
+      border: 1px solid var(--villume-blue);
+      color: #ffffff;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+    .btn-request-art:hover {
+      background: var(--villume-blue);
+      box-shadow: 0 4px 14px var(--villume-blue-glow);
+    }
+
+    /* Screen 5 & 6 & 7: Dialog Confirmation Modals */
+    .dialog-confirm-card {
+      width: 440px;
+      max-width: 90vw;
+      background: #8e8e92;
+      border-radius: 8px;
+      padding: 36px 32px 32px 32px;
+      color: #1a1a1a;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.6);
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
-      z-index: 10;
-      box-shadow: var(--glass-shadow);
       text-align: center;
     }
 
-    .info-modal-drawer {
-      position: absolute;
-      top: 110px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 840px;
-      max-width: 90vw;
-      max-height: calc(100vh - 220px);
-      overflow-y: auto;
-      background: var(--glass-bg);
-      backdrop-filter: blur(48px) saturate(140%);
-      -webkit-backdrop-filter: blur(48px) saturate(140%);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-xl);
-      padding: 32px;
-      z-index: 15;
-      display: none;
-      box-shadow: var(--glass-shadow);
-    }
-    .info-modal-drawer.show {
-      display: block;
-      animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    .dialog-confirm-card.blue-focus {
+      border: 2px solid var(--villume-blue);
+      box-shadow: 0 0 24px var(--villume-blue-glow), 0 24px 60px rgba(0,0,0,0.6);
     }
 
-    .dock-horizontal {
-      background: var(--glass-bg);
-      backdrop-filter: blur(40px) saturate(140%);
-      -webkit-backdrop-filter: blur(40px) saturate(140%);
-      border: 1px solid var(--glass-border);
-      box-shadow: var(--glass-shadow);
-      border-radius: var(--radius-full);
-      padding: 10px 22px;
+    .dialog-text {
+      font-size: 16px;
+      font-weight: 500;
+      color: #1a1a1a;
+      line-height: 1.45;
+      margin-bottom: 28px;
+    }
+
+    .dialog-actions {
       display: flex;
-      align-items: center;
-      gap: 14px;
-      z-index: 20;
-      margin-bottom: 32px;
+      gap: 12px;
+      justify-content: flex-end;
+      width: 100%;
     }
 
-    .share-toast {
+    .btn-dialog-default {
+      background: #d6d6d8;
+      color: #000;
+      border: none;
+      border-radius: 999px;
+      padding: 8px 24px;
+      font-size: 13.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-dialog-default:hover {
+      background: #c5c5c8;
+    }
+
+    .btn-dialog-primary {
+      background: var(--villume-blue);
+      color: #ffffff;
+      border: none;
+      border-radius: 999px;
+      padding: 8px 28px;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px var(--villume-blue-glow);
+    }
+    .btn-dialog-primary:hover {
+      background: var(--villume-blue-hover);
+      transform: translateY(-1px);
+    }
+
+    /* Screen 8: Welcome Modal */
+    .welcome-modal-card {
+      width: 480px;
+      max-width: 90vw;
+      background: #252528;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 36px 36px 32px 36px;
+      text-align: center;
+      box-shadow: 0 32px 70px rgba(0, 0, 0, 0.7);
+    }
+
+    .welcome-arch-img {
+      max-width: 280px;
+      margin: 0 auto 20px auto;
+      display: block;
+      filter: drop-shadow(0 12px 24px rgba(0,0,0,0.5));
+    }
+
+    .welcome-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 12px;
+    }
+
+    .welcome-desc {
+      font-size: 13.5px;
+      color: #a1a1aa;
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+
+    .btn-explore-now {
+      background: var(--villume-blue);
+      color: #ffffff;
+      border: none;
+      border-radius: 999px;
+      padding: 11px 36px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 16px var(--villume-blue-glow);
+    }
+    .btn-explore-now:hover {
+      background: var(--villume-blue-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px var(--villume-blue-glow);
+    }
+
+    /* ==========================================================================
+       Light Mode Overrides for Prototype View (Apple Vision Pro Solid Crisp Glass)
+       ========================================================================== */
+    body[data-theme="light"] {
+      background: #f1f2f6;
+      color: #0f172a;
+    }
+
+    body[data-theme="light"] .bg-vr-villa {
+      filter: brightness(1.05) saturate(1.05);
+    }
+
+    body[data-theme="light"] .bg-dollhouse {
+      background-color: #e2e8f0;
+    }
+
+    body[data-theme="light"] .ui-inspector-bar {
+      background: rgba(255, 255, 255, 0.98) !important;
+      border: 1px solid rgba(0, 0, 0, 0.12) !important;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.14) !important;
+    }
+
+    body[data-theme="light"] .inspector-pill {
+      color: #334155 !important;
+      font-weight: 500;
+    }
+
+    body[data-theme="light"] .inspector-pill:hover {
+      background: #f1f5f9 !important;
+      color: #0f172a !important;
+    }
+
+    body[data-theme="light"] .inspector-pill.active {
+      background: var(--villume-blue) !important;
+      color: #ffffff !important;
+      font-weight: 700;
+    }
+
+    body[data-theme="light"] .inspector-toggle {
+      background: #f1f5f9 !important;
+      border: 1px solid rgba(0, 0, 0, 0.1) !important;
+      color: #0f172a !important;
+    }
+
+    .card-main-title,
+    .card-section-label {
+      color: #ffffff;
+    }
+    .card-creator-subtitle,
+    .card-contact-line {
+      color: #a1a1aa;
+    }
+
+    body[data-theme="light"] .card-main-title {
+      color: #0f172a !important;
+      font-weight: 800 !important;
+    }
+    body[data-theme="light"] .card-section-label {
+      color: #0f172a !important;
+      font-weight: 700 !important;
+    }
+    body[data-theme="light"] .card-creator-subtitle {
+      color: #475569 !important;
+    }
+    body[data-theme="light"] .card-contact-line {
+      color: #475569 !important;
+      font-weight: 500 !important;
+    }
+
+    /* Modal Windows in Light Mode: Solid Opaque White with Rich Contrast */
+    body[data-theme="light"] .dark-card-panel,
+    body[data-theme="light"] .modal-content-card {
+      background: #ffffff !important;
+      border: 1px solid rgba(0, 0, 0, 0.1) !important;
+      box-shadow: 0 32px 80px rgba(0, 0, 0, 0.22), 0 4px 16px rgba(0, 0, 0, 0.06) !important;
+      color: #0f172a !important;
+    }
+
+    body[data-theme="light"] .card-top-title {
+      color: #0f172a !important;
+      font-weight: 700 !important;
+    }
+
+    body[data-theme="light"] .btn-close-modal {
+      color: #64748b !important;
+    }
+    body[data-theme="light"] .btn-close-modal:hover {
+      color: #0f172a !important;
+    }
+
+    body[data-theme="light"] .card-social-icons a {
+      color: #334155 !important;
+    }
+    body[data-theme="light"] .card-social-icons a:hover {
+      color: var(--villume-blue) !important;
+    }
+
+    body[data-theme="light"] .card-body-text {
+      color: #334155 !important;
+    }
+    body[data-theme="light"] .card-body-text .show-more {
+      color: var(--villume-blue) !important;
+      font-weight: 700 !important;
+    }
+
+    body[data-theme="light"] .share-section-label {
+      color: #0f172a !important;
+      font-weight: 700 !important;
+    }
+
+    body[data-theme="light"] .share-input-box {
+      background: #f1f5f9 !important;
+      border: 1px solid #cbd5e1 !important;
+      color: #0f172a !important;
+      font-weight: 500 !important;
+    }
+
+    body[data-theme="light"] .btn-share-pill {
+      background: #e2e8f0 !important;
+      color: #0f172a !important;
+      font-weight: 600 !important;
+    }
+    body[data-theme="light"] .btn-share-pill:hover {
+      background: #cbd5e1 !important;
+    }
+
+    body[data-theme="light"] .thumb-card-item {
+      background: #ffffff !important;
+      border: 1px solid #cbd5e1 !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+    }
+    body[data-theme="light"] .thumb-card-item:hover {
+      border-color: var(--villume-blue) !important;
+      box-shadow: 0 4px 14px rgba(64, 118, 245, 0.25) !important;
+    }
+
+    body[data-theme="light"] .thumb-caption {
+      background: #f8fafc !important;
+      color: #0f172a !important;
+      font-weight: 600 !important;
+    }
+
+    /* Screen 3 Artwork Inspect Card in Light Mode */
+    body[data-theme="light"] .artwork-inspect-card {
+      background: #ffffff !important;
+      border: 1px solid rgba(0, 0, 0, 0.12) !important;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25) !important;
+      color: #0f172a !important;
+    }
+    body[data-theme="light"] .artwork-inspect-card div {
+      color: #0f172a !important;
+    }
+    body[data-theme="light"] .artwork-inspect-card p {
+      color: #334155 !important;
+    }
+    body[data-theme="light"] .artwork-inspect-card .btn-request-art {
+      background: var(--villume-blue) !important;
+      color: #ffffff !important;
+      border-color: var(--villume-blue) !important;
+    }
+
+    /* Screen 5, 6, 7 Dialog Confirm Cards in Light Mode */
+    body[data-theme="light"] .dialog-confirm-card {
+      background: #ffffff !important;
+      border: 1px solid rgba(0, 0, 0, 0.12) !important;
+      box-shadow: 0 28px 70px rgba(0, 0, 0, 0.22) !important;
+      color: #0f172a !important;
+    }
+    body[data-theme="light"] .dialog-confirm-card.blue-focus {
+      border: 2px solid var(--villume-blue) !important;
+      box-shadow: 0 0 24px var(--villume-blue-glow), 0 28px 70px rgba(0, 0, 0, 0.22) !important;
+    }
+    body[data-theme="light"] .dialog-text {
+      color: #0f172a !important;
+      font-weight: 600 !important;
+    }
+    body[data-theme="light"] .btn-dialog-default {
+      background: #f1f5f9 !important;
+      color: #0f172a !important;
+      border: 1px solid #cbd5e1 !important;
+      font-weight: 600 !important;
+    }
+    body[data-theme="light"] .btn-dialog-default:hover {
+      background: #e2e8f0 !important;
+    }
+    body[data-theme="light"] .btn-dialog-primary {
+      background: var(--villume-blue) !important;
+      color: #ffffff !important;
+      font-weight: 700 !important;
+    }
+
+    /* Screen 8 Welcome Modal in Light Mode */
+    body[data-theme="light"] .welcome-modal-card {
+      background: #ffffff !important;
+      border: 1px solid rgba(0, 0, 0, 0.12) !important;
+      box-shadow: 0 32px 80px rgba(0, 0, 0, 0.24) !important;
+      color: #0f172a !important;
+    }
+    body[data-theme="light"] .welcome-title {
+      color: #0f172a !important;
+      font-weight: 800 !important;
+    }
+    body[data-theme="light"] .welcome-desc {
+      color: #334155 !important;
+    }
+    body[data-theme="light"] .btn-explore-now {
+      background: var(--villume-blue) !important;
+      color: #ffffff !important;
+      font-weight: 700 !important;
+    }
+
+    /* Bottom Dock in Light Mode */
+    body[data-theme="light"] .bottom-vr-dock {
+      background: rgba(255, 255, 255, 0.95) !important;
+      border: 1px solid rgba(0, 0, 0, 0.14) !important;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+    }
+    body[data-theme="light"] .dock-icon-btn {
+      color: #475569 !important;
+    }
+    body[data-theme="light"] .dock-icon-btn:hover {
+      color: #0f172a !important;
+      background: #f1f5f9 !important;
+    }
+    body[data-theme="light"] .dock-icon-btn.active {
+      color: #ffffff !important;
+      background: var(--villume-blue) !important;
+      box-shadow: 0 4px 14px var(--villume-blue-glow) !important;
+    }
+
+    /* Bottom 7-Icon VR Navigation Dock */
+    .bottom-vr-dock {
       position: fixed;
       bottom: 24px;
-      right: 24px;
-      background: #10b981;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(26, 26, 30, 0.88);
+      backdrop-filter: blur(40px) saturate(140%);
+      -webkit-backdrop-filter: blur(40px) saturate(140%);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 999px;
+      padding: 8px 18px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      z-index: 500;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .dock-icon-btn {
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.75);
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+    }
+
+    .dock-icon-btn:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateY(-2px);
+    }
+
+    .dock-icon-btn.active {
+      color: var(--villume-blue) !important;
+      background: rgba(64, 118, 245, 0.15);
+      box-shadow: 0 0 16px var(--villume-blue-glow);
+    }
+
+    /* Notification Toast */
+    .toast-box {
+      position: fixed;
+      bottom: 84px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #18181b;
+      border: 1px solid rgba(255, 255, 255, 0.12);
       color: #fff;
-      padding: 10px 20px;
-      border-radius: var(--radius-full);
+      padding: 10px 22px;
+      border-radius: 999px;
       font-size: 13px;
-      font-weight: 600;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+      font-weight: 500;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.5);
       z-index: 2000;
       display: none;
+      animation: toastIn 0.25s ease;
+    }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translate(-50%, 10px); }
+      to { opacity: 1; transform: translate(-50%, 0); }
     }
   </style>
 </head>
 <body data-theme="dark">
 
-  <div class="prototype-page">
-    <!-- VR Walkthrough Video -->
-    <video class="proto-bg-video" autoplay loop muted playsinline>
-      <source src="assets/videos/vr-walkthrough.mp4" type="video/mp4">
-    </video>
-
-    <!-- Top Canvas HUD -->
-    <div class="top-canvas-overlay fade-up" id="top-card">
-      <div style="font-size: 20px; font-weight: 700; letter-spacing: -0.4px;">Dark Valley</div>
-      <div style="font-size: 13px; color: var(--muted-foreground);">By Georg Katstaller &bull; Spatial Walkthrough</div>
+  <div class="vr-stage">
+    
+    <!-- Background Layers -->
+    <div class="bg-layer bg-vr-villa" id="bg-villa"></div>
+    <div class="bg-layer bg-artwork-wall" id="bg-artwork-wall"></div>
+    <div class="bg-layer bg-dollhouse" id="bg-dollhouse">
+      <img src="assets/images/file_2023-09-19_06.21 1.png" alt="Dollhouse 3D Floor Overview" class="dollhouse-img">
     </div>
 
-    <!-- Info Drawer Modal -->
-    <div class="info-modal-drawer" id="info-drawer">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-        <h2 style="font-size: 20px; font-weight: 700;">Exhibition Details</h2>
-        <button class="nav-item" style="width: 32px; height: 32px;" onclick="toggleInfo()"><i class="ph ph-x"></i></button>
+    <!-- UI Inspector & Quick-Switch Toolbar (User Access) -->
+    <div class="ui-inspector-bar" id="inspector-bar">
+      <div class="inspector-badge">Check UI (1-8)</div>
+      <div class="inspector-pills">
+        <button class="inspector-pill" data-screen="1" onclick="switchShowcaseScreen(1)">1. Gallery Info</button>
+        <button class="inspector-pill" data-screen="2" onclick="switchShowcaseScreen(2)">2. Creator Profile</button>
+        <button class="inspector-pill" data-screen="3" onclick="switchShowcaseScreen(3)">3. Artwork Wall</button>
+        <button class="inspector-pill" data-screen="4" onclick="switchShowcaseScreen(4)">4. Dollhouse 3D</button>
+        <button class="inspector-pill" data-screen="5" onclick="switchShowcaseScreen(5)">5. Exit Gallery</button>
+        <button class="inspector-pill" data-screen="6" onclick="switchShowcaseScreen(6)">6. Exit Villume</button>
+        <button class="inspector-pill" data-screen="7" onclick="switchShowcaseScreen(7)">7. Dashboard Alert</button>
+        <button class="inspector-pill" data-screen="8" onclick="switchShowcaseScreen(8)">8. Welcome Modal</button>
+      </div>
+      <button class="inspector-toggle" onclick="toggleTheme()" id="theme-btn" title="Toggle Theme (Dark / Light)">
+        <i class="ph ph-sun-dim" id="theme-icon"></i>
+      </button>
+      <button class="inspector-toggle" onclick="toggleInspector()" title="Toggle Switcher Bar">
+        <i class="ph ph-caret-up" id="toggle-icon"></i>
+      </button>
+      <a href="galleries.html" class="inspector-pill" style="border:1px solid rgba(255,255,255,0.15);" title="Go to Dashboard">
+        <i class="ph ph-arrow-u-up-left"></i> Dashboard
+      </a>
+    </div>
+
+    <!-- Modal Containers -->
+    <div class="modal-overlay-container">
+      
+      <!-- SCREEN 1: GALLERY INFO MODAL (Image 1) -->
+      <div class="modal-window dark-card-panel modal-content-card" id="screen-1">
+        <div class="card-top-header">
+          <div class="card-top-title">Gallery</div>
+          <button class="btn-close-modal" onclick="closeAllModals()"><i class="ph ph-x"></i></button>
+        </div>
+
+        <div class="card-main-title" style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">Gallery Title</div>
+        
+        <div class="card-creator-row">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="width: 22px; height: 22px; border-radius: 50%; background: #333; display: flex; align-items: center; justify-content: center; font-size: 13px;">
+              <i class="ph ph-user"></i>
+            </div>
+            <span class="card-creator-subtitle" style="font-size: 13px;">by full name</span>
+          </div>
+        </div>
+
+        <div class="card-social-icons" style="margin-bottom: 16px;">
+          <a href="#" aria-label="Facebook"><i class="ph-fill ph-facebook-logo"></i></a>
+          <a href="#" aria-label="Instagram"><i class="ph ph-instagram-logo"></i></a>
+          <a href="#" aria-label="Website"><i class="ph ph-globe"></i></a>
+        </div>
+
+        <p class="card-body-text">
+          Lorem ipsum dolor sit amet, consec tetur adipiscing elit. Vivamus efficitur est ex, nec bibendum erat semper in. Ut hendrerit porta ex vitae elem entum. Vestibulum condimentum mauris non leo varius elementum. Donec sed ultricies tellus. Duis eget urna nec urna consectetur malesuada in id ipsum <span class="show-more" onclick="showToast('Showing full exhibition description')">Show more &darr;</span>
+        </p>
+
+        <div class="share-section-label">Share Gallery</div>
+        <div class="share-bar-group">
+          <input type="text" class="share-input-box" id="share-input-field" value="https://gallery.villume.com/" readonly>
+          <button class="btn-share-pill" onclick="copyShareLink()">Copy</button>
+          <button class="btn-share-pill" onclick="showToast('Exhibition shared!')">Share</button>
+        </div>
+
+        <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 16px; margin-bottom: 8px;">
+        <div class="card-section-label" style="font-size: 13.5px; font-weight: 600; margin-bottom: 10px;">List of Artwork</div>
+          <div class="grid-artworks-8">
+            <div class="thumb-card-item" onclick="switchShowcaseScreen(3)">
+              <div class="thumb-img-wrap"><img src="assets/images/gallery-dark-valleys-1.png" alt="The Studio Is Openi.."></div>
+              <div class="thumb-caption">The Studio Is Openi..</div>
+            </div>
+            <div class="thumb-card-item" onclick="switchShowcaseScreen(3)">
+              <div class="thumb-img-wrap"><img src="assets/images/gallery-dark-valleys-2.png" alt="Dark Valleys"></div>
+              <div class="thumb-caption">Dark Valleys</div>
+            </div>
+            <div class="thumb-card-item" onclick="switchShowcaseScreen(3)">
+              <div class="thumb-img-wrap"><img src="assets/images/gallery-dark-valleys-3.png" alt="From Stone to Silic..."></div>
+              <div class="thumb-caption">From Stone to Silic...</div>
+            </div>
+            <div class="thumb-card-item" onclick="switchShowcaseScreen(3)">
+              <div class="thumb-img-wrap"><img src="assets/images/gallery-dark-valleys-4.png" alt="Stranded"></div>
+              <div class="thumb-caption">Stranded</div>
+            </div>
+            <div class="thumb-card-item" onclick="switchShowcaseScreen(3)">
+              <div class="thumb-img-wrap"><img src="assets/images/gallery-dark-valleys-1.png" alt="The Studio Is Openi.."></div>
+              <div class="thumb-caption">The Studio Is Openi..</div>
+            </div>
+            <div class="thumb-card-item" onclick="switchShowcaseScreen(3)">
+              <div class="thumb-img-wrap"><img src="assets/images/gallery-dark-valleys-2.png" alt="Dark Valleys"></div>
+              <div class="thumb-caption">Dark Valleys</div>
+            </div>
+            <div class="thumb-card-item" onclick="switchShowcaseScreen(3)">
+              <div class="thumb-img-wrap"><img src="assets/images/gallery-dark-valleys-3.png" alt="From Stone to Silic..."></div>
+              <div class="thumb-caption">From Stone to Silic...</div>
+            </div>
+            <div class="thumb-card-item" onclick="switchShowcaseScreen(3)">
+              <div class="thumb-img-wrap"><img src="assets/images/gallery-dark-valleys-4.png" alt="Stranded"></div>
+              <div class="thumb-caption">Stranded</div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- Curator Card -->
-      <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; background: var(--muted); border-radius: var(--radius-lg); margin-bottom: 24px;">
-        <div style="display: flex; align-items: center; gap: 14px;">
-          <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=128&q=80" alt="Curator" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover;">
+      <!-- SCREEN 2: MORE FROM THIS CREATOR MODAL (Image 2) -->
+      <div class="modal-window dark-card-panel modal-content-card" id="screen-2">
+        <div class="card-top-header">
+          <div class="card-top-title">More From This Creator</div>
+          <button class="btn-close-modal" onclick="closeAllModals()"><i class="ph ph-x"></i></button>
+        </div>
+
+        <div class="card-creator-row">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80" alt="Esther Howard" class="card-creator-avatar">
           <div>
-            <div style="font-size: 11px; text-transform: uppercase; color: var(--muted-foreground); font-weight: 600;">Curator</div>
-            <div style="font-size: 15px; font-weight: 600;">Esther Howard</div>
+            <div class="card-main-title" style="font-size: 18px; font-weight: 700;">Esther Howard</div>
+            <div style="font-size: 13px; color: #8e8e93; margin-top: 2px;">esther_howard</div>
+            <div class="card-social-icons">
+              <a href="#" aria-label="Facebook"><i class="ph-fill ph-facebook-logo"></i></a>
+              <a href="#" aria-label="Instagram"><i class="ph ph-instagram-logo"></i></a>
+              <a href="#" aria-label="Website"><i class="ph ph-globe"></i></a>
+            </div>
           </div>
         </div>
-        <div style="display: flex; gap: 8px;">
-          <button class="nav-item" style="width: 36px; height: 36px; font-size: 16px;" onclick="showToast('Contacting curator...')"><i class="ph ph-chat-circle"></i></button>
+
+        <div class="card-contact-line" style="font-size: 13px; margin-bottom: 4px;">Subang, West Java, Indonesia</div>
+        <div class="card-contact-line" style="font-size: 13px; margin-bottom: 14px;">johndoe@gmail.com</div>
+
+        <p class="card-body-text">
+          Lorem ipsum dolor sit amet, consec tetur adipiscing elit. Vivamus efficitur est ex, nec bibendum erat semper in. Ut hendrerit porta ex vitae elem entum. Vestibulum condimentum mauris non leo varius elementum. Donec sed ultricies tellus. Duis eget urna nec urna consectetur malesuada in id ipsum <span class="show-more" onclick="showToast('Showing full creator bio')">Show more &darr;</span>
+        </p>
+
+        <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 16px; margin-bottom: 8px;">
+          <div class="card-section-label" style="font-size: 13.5px; font-weight: 600; margin-bottom: 10px;">Galleries</div>
+          <div class="grid-artworks-8">
+            <div class="thumb-card-item" onclick="switchShowcaseScreen(3)">
+              <div class="thumb-img-wrap"><img src="assets/images/gallery-dark-valleys-1.png" alt="The Studio Is Openi.."></div>
+              <div class="thumb-caption">The Studio Is Openi..</div>
+            </div>
+            <div class="thumb-card-item" onclick="switchShowcaseScreen(3)">
+              <div class="thumb-img-wrap"><img src="assets/images/gallery-dark-valleys-2.png" alt="Dark Valleys"></div>
+              <div class="thumb-caption">Dark Valleys</div>
+            </div>
+            <div class="thumb-card-item" onclick="switchShowcaseScreen(3)">
+              <div class="thumb-img-wrap"><img src="assets/images/gallery-dark-valleys-3.png" alt="From Stone to Silic..."></div>
+              <div class="thumb-caption">From Stone to Silic...</div>
+            </div>
+            <div class="thumb-card-item" onclick="switchShowcaseScreen(3)">
+              <div class="thumb-img-wrap"><img src="assets/images/gallery-dark-valleys-4.png" alt="Stranded"></div>
+              <div class="thumb-caption">Stranded</div>
+            </div>
+            <div class="thumb-card-item" onclick="switchShowcaseScreen(3)">
+              <div class="thumb-img-wrap"><img src="assets/images/gallery-dark-valleys-1.png" alt="The Studio Is Openi.."></div>
+              <div class="thumb-caption">The Studio Is Openi..</div>
+            </div>
+            <div class="thumb-card-item" onclick="switchShowcaseScreen(3)">
+              <div class="thumb-img-wrap"><img src="assets/images/gallery-dark-valleys-2.png" alt="Dark Valleys"></div>
+              <div class="thumb-caption">Dark Valleys</div>
+            </div>
+            <div class="thumb-card-item" onclick="switchShowcaseScreen(3)">
+              <div class="thumb-img-wrap"><img src="assets/images/gallery-dark-valleys-3.png" alt="From Stone to Silic..."></div>
+              <div class="thumb-caption">From Stone to Silic...</div>
+            </div>
+            <div class="thumb-card-item" onclick="switchShowcaseScreen(3)">
+              <div class="thumb-img-wrap"><img src="assets/images/gallery-dark-valleys-4.png" alt="Stranded"></div>
+              <div class="thumb-caption">Stranded</div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div style="margin-bottom: 28px; line-height: 1.7; font-size: 14px; color: var(--foreground); opacity: 0.85;">
-        <p>Step inside this fully immersive VR exhibition environment. Navigate freely through spatial architectural rooms, explore handcrafted physical and digital installations, and interact with artworks in real-time stereoscopic depth.</p>
-      </div>
-
-      <!-- Share Section -->
-      <div style="margin-bottom: 28px;">
-        <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">Share Gallery</h4>
-        <div style="display: flex; gap: 10px;">
-          <input type="text" id="share-url-input" value="https://gallery.villume.com/exhibition/dark-valley" readonly style="flex:1; background: var(--muted); border: 1px solid var(--border); border-radius: var(--radius-full); padding: 0 16px; color: var(--foreground); outline: none; font-size: 13px;">
-          <button class="btn-primary" onclick="copyShareLink()"><i class="ph ph-copy"></i> Copy</button>
+      <!-- SCREEN 5: EXIT GALLERY CONFIRM MODAL (Image 5) -->
+      <div class="modal-window dialog-confirm-card" id="screen-5">
+        <div class="dialog-text">Are you sure you want to exit the gallery?</div>
+        <div class="dialog-actions">
+          <button class="btn-dialog-default" onclick="confirmExitGallery()">Yes</button>
+          <button class="btn-dialog-primary" onclick="closeAllModals()">No</button>
         </div>
       </div>
 
-      <!-- List of Artworks -->
-      <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 14px;">Included Artworks</h4>
-      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
-        <div class="media-card" style="padding: 10px;">
-          <div class="media-img-wrap" style="aspect-ratio: 4/3;">
-            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=400&q=80" alt="Dark Valleys">
-          </div>
-          <div class="media-info" style="margin-top: 8px;">
-            <div style="font-size: 11px; color: var(--muted-foreground);">GEORG KATSTALLER</div>
-            <div style="font-size: 13px; font-weight: 600;">Dark Valleys</div>
-          </div>
+      <!-- SCREEN 6: EXIT VILLUME CONFIRM MODAL (Image 6) -->
+      <div class="modal-window dialog-confirm-card blue-focus" id="screen-6">
+        <div class="dialog-text">Are you sure you want to exit Villume?</div>
+        <div class="dialog-actions">
+          <button class="btn-dialog-default" onclick="window.location.href='galleries.html'">Yes</button>
+          <button class="btn-dialog-primary" onclick="closeAllModals()">No</button>
         </div>
+      </div>
 
-        <div class="media-card" style="padding: 10px;">
-          <div class="media-img-wrap" style="aspect-ratio: 4/3;">
-            <img src="https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=400&q=80" alt="From Stone to Silicone">
-          </div>
-          <div class="media-info" style="margin-top: 8px;">
-            <div style="font-size: 11px; color: var(--muted-foreground);">VILLUME</div>
-            <div style="font-size: 13px; font-weight: 600;">From Stone to Silicone</div>
-          </div>
+      <!-- SCREEN 7: DASHBOARD ALERT MODAL (Image 7) -->
+      <div class="modal-window dialog-confirm-card" id="screen-7">
+        <div class="dialog-text">You're already on the Gallery Dashboard. Press 'Confirm' to continue</div>
+        <div class="dialog-actions" style="justify-content: flex-end;">
+          <button class="btn-dialog-primary" onclick="window.location.href='galleries.html'">Confirm</button>
         </div>
+      </div>
 
-        <div class="media-card" style="padding: 10px;">
-          <div class="media-img-wrap" style="aspect-ratio: 4/3;">
-            <img src="https://images.unsplash.com/photo-1549213821-4708d624e1d1?auto=format&fit=crop&w=400&q=80" alt="Stranded">
+      <!-- SCREEN 8: WELCOME MODAL (Image 8) -->
+      <div class="modal-window welcome-modal-card" id="screen-8">
+        <img src="assets/images/videoframe_28215 3.png" alt="Welcome to Villume" class="welcome-arch-img">
+        <div class="welcome-title">Welcome to Villume</div>
+        <div class="welcome-desc">
+          Villume is a platform developed in collaboration with international galleries & artists, creating the ideal environments for artwork to be displayed in a unique digital exhibition.
+        </div>
+        <button class="btn-explore-now" onclick="switchShowcaseScreen(1)">Explore Now</button>
+      </div>
+
+    </div>
+
+    <!-- SCREEN 3: ARTWORK INSPECTION POPUP (Image 3 - galiry page) -->
+    <div class="artwork-inspect-container" id="artwork-wall-overlay" style="display: none;">
+      <div class="artwork-inspect-wrapper">
+        <div class="artwork-inspect-card">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+            <div style="font-size: 16px; font-weight: 700; color: #fff;">Title Artwork</div>
+            <button class="btn-close-modal" onclick="closeArtworkInspect()"><i class="ph ph-x"></i></button>
           </div>
-          <div class="media-info" style="margin-top: 8px;">
-            <div style="font-size: 11px; color: var(--muted-foreground);">POLINA SHUBKINA</div>
-            <div style="font-size: 13px; font-weight: 600;">Stranded</div>
+          
+          <div style="font-size: 11px; color: #a1a1aa; margin-bottom: 4px;">2023</div>
+          <div style="display: flex; justify-content: space-between; font-size: 10px; color: #71717a; margin-bottom: 14px;">
+            <span>Glass Material</span>
+            <span>14cm x 32cm</span>
           </div>
+
+          <div style="font-size: 17px; font-weight: 700; color: #ffffff; margin-bottom: 14px;">$ 120.00</div>
+
+          <p style="font-size: 11px; color: #b0b0b5; line-height: 1.5; margin-bottom: 14px;">
+            Bio User Dolor ipsum set amet kontenpopular dilir sit ameitr kontrktopolty dismis bit kin win durerotDolor ipsum set amet kontenpopular dilir sit ameitr kontrktopolty dismis bit kin winBio User Dolor ipsum set amet kontenpopular dilir sit ameitr kontrktopolty dismis bit kin win durerot
+          </p>
+
+          <div style="font-size: 11.5px; font-weight: 500; color: #ffffff;">by Artist Name</div>
+
+          <button class="btn-request-art" onclick="showToast('Artwork purchase requested!')">Request Artwork</button>
         </div>
       </div>
     </div>
 
-    <!-- VR Bottom Control Dock -->
-    <nav class="dock-horizontal fade-up" id="bottom-dock">
-      <a href="galleries.html" class="nav-item" title="Exit to Galleries"><i class="ph ph-x"></i></a>
-      <div style="width: 1px; height: 20px; background: var(--border-subtle); margin: 0 4px;"></div>
-      <button class="nav-item" onclick="setLocomotion('walk')" id="loco-walk" title="Walk Mode"><i class="ph ph-sneaker"></i></button>
-      <button class="nav-item active" onclick="setLocomotion('fly')" id="loco-fly" title="Fly Mode"><i class="ph ph-paper-plane-tilt"></i></button>
-      <button class="nav-item" onclick="setLocomotion('teleport')" id="loco-teleport" title="Teleport Mode"><i class="ph ph-target"></i></button>
-      <div style="width: 1px; height: 20px; background: var(--border-subtle); margin: 0 4px;"></div>
-      <button class="nav-item" onclick="toggleInfo()" title="Exhibition Info"><i class="ph ph-info"></i></button>
+    <!-- BOTTOM 7-ICON NAVIGATION DOCK (Apple Vision Pro & VR Standard) -->
+    <nav class="bottom-vr-dock">
+      <!-- 1. Cube / Dollhouse -->
+      <button class="dock-icon-btn" id="dock-btn-cube" onclick="handleDockClick('cube')" title="Dollhouse 3D Floor View">
+        <i class="ph ph-cube"></i>
+      </button>
+
+      <!-- 2. Help / Onboarding -->
+      <button class="dock-icon-btn" id="dock-btn-help" onclick="handleDockClick('help')" title="Welcome & Help">
+        <i class="ph ph-question"></i>
+      </button>
+
+      <!-- 3. Step Back / Prev Artwork -->
+      <button class="dock-icon-btn" id="dock-btn-prev" onclick="handleDockClick('prev')" title="Previous Artwork">
+        <i class="ph ph-skip-back"></i>
+      </button>
+
+      <!-- 4. Play Tour -->
+      <button class="dock-icon-btn" id="dock-btn-play" onclick="handleDockClick('play')" title="Play / Explore Tour">
+        <i class="ph ph-play" id="play-icon"></i>
+      </button>
+
+      <!-- 5. Step Forward / Next Artwork -->
+      <button class="dock-icon-btn" id="dock-btn-next" onclick="handleDockClick('next')" title="Next Artwork">
+        <i class="ph ph-skip-forward"></i>
+      </button>
+
+      <!-- 6. Info (Gallery Info Modal) -->
+      <button class="dock-icon-btn" id="dock-btn-info" onclick="handleDockClick('info')" title="Gallery Exhibition Details">
+        <i class="ph ph-info"></i>
+      </button>
+
+      <!-- 7. Creator / User Profile -->
+      <button class="dock-icon-btn" id="dock-btn-creator" onclick="handleDockClick('creator')" title="More From This Creator">
+        <i class="ph ph-user-circle"></i>
+      </button>
     </nav>
+
   </div>
 
-  <div class="share-toast" id="toast-notify">Notification</div>
+  <!-- Toast Notification -->
+  <div class="toast-box" id="app-toast">Notification</div>
 
   <script>
-    function toggleInfo() {
-      document.getElementById('info-drawer').classList.toggle('show');
-    }
-
-    function setLocomotion(mode) {
-      ['walk', 'fly', 'teleport'].forEach(m => {
-        const el = document.getElementById('loco-' + m);
-        if (el) el.classList.remove('active');
-      });
-      const activeEl = document.getElementById('loco-' + mode);
-      if (activeEl) activeEl.classList.add('active');
-      showToast('Locomotion mode: ' + mode.toUpperCase());
-    }
+    let activeScreenIndex = 1;
+    let isPlaying = false;
 
     function showToast(msg) {
-      const toast = document.getElementById('toast-notify');
+      const toast = document.getElementById('app-toast');
       toast.textContent = msg;
       toast.style.display = 'block';
       setTimeout(() => {
         toast.style.display = 'none';
-      }, 2500);
+      }, 2200);
     }
 
     function copyShareLink() {
-      const input = document.getElementById('share-url-input');
+      const input = document.getElementById('share-input-field');
       input.select();
       navigator.clipboard.writeText(input.value).then(() => {
-        showToast('Link copied to clipboard!');
+        showToast('Gallery URL copied to clipboard!');
       });
     }
 
+    function toggleTheme() {
+      const current = document.body.getAttribute('data-theme') || 'dark';
+      const next = current === 'dark' ? 'light' : 'dark';
+      setTheme(next);
+      showToast('Theme switched to ' + next.toUpperCase() + ' mode');
+    }
+
+    function setTheme(theme) {
+      document.body.setAttribute('data-theme', theme);
+      const icon = document.getElementById('theme-icon');
+      if (icon) {
+        icon.className = theme === 'light' ? 'ph ph-moon' : 'ph ph-sun-dim';
+      }
+      localStorage.setItem('villume_theme', theme);
+    }
+
+    function toggleInspector() {
+      const bar = document.getElementById('inspector-bar');
+      bar.classList.toggle('minimized');
+      const icon = document.getElementById('toggle-icon');
+      if (bar.classList.contains('minimized')) {
+        icon.className = 'ph ph-caret-down';
+      } else {
+        icon.className = 'ph ph-caret-up';
+      }
+    }
+
+    function closeAllModals() {
+      document.querySelectorAll('.modal-window').forEach(w => w.classList.remove('active'));
+      document.getElementById('artwork-wall-overlay').style.display = 'none';
+      document.querySelectorAll('.dock-icon-btn').forEach(b => b.classList.remove('active'));
+    }
+
+    function closeArtworkInspect() {
+      document.getElementById('artwork-wall-overlay').style.display = 'none';
+    }
+
+    function confirmExitGallery() {
+      showToast('Exiting gallery...');
+      setTimeout(() => {
+        window.location.href = 'galleries.html';
+      }, 700);
+    }
+
+    // Main Switcher Function (Screens 1 - 8)
+    function switchShowcaseScreen(screenNum) {
+      activeScreenIndex = screenNum;
+
+      // Update Inspector Pills
+      document.querySelectorAll('.inspector-pill').forEach(pill => {
+        if (pill.getAttribute('data-screen') === String(screenNum)) {
+          pill.classList.add('active');
+        } else {
+          pill.classList.remove('active');
+        }
+      });
+
+      // Reset backgrounds
+      const bgVilla = document.getElementById('bg-villa');
+      const bgArtworkWall = document.getElementById('bg-artwork-wall');
+      const bgDollhouse = document.getElementById('bg-dollhouse');
+      const artworkWallOverlay = document.getElementById('artwork-wall-overlay');
+
+      bgVilla.style.display = 'block';
+      bgArtworkWall.style.display = 'none';
+      bgDollhouse.style.display = 'none';
+      artworkWallOverlay.style.display = 'none';
+
+      // Reset all modal windows
+      document.querySelectorAll('.modal-window').forEach(w => w.classList.remove('active'));
+
+      // Reset dock icon active states
+      document.querySelectorAll('.dock-icon-btn').forEach(b => b.classList.remove('active'));
+
+      if (screenNum === 1) {
+        // SCREEN 1: Gallery Info Modal
+        document.getElementById('screen-1').classList.add('active');
+        document.getElementById('dock-btn-info').classList.add('active');
+      } else if (screenNum === 2) {
+        // SCREEN 2: Creator Profile Modal
+        document.getElementById('screen-2').classList.add('active');
+        document.getElementById('dock-btn-creator').classList.add('active');
+      } else if (screenNum === 3) {
+        // SCREEN 3: Artwork Inspection Wall
+        bgVilla.style.display = 'none';
+        bgArtworkWall.style.display = 'block';
+        artworkWallOverlay.style.display = 'flex';
+      } else if (screenNum === 4) {
+        // SCREEN 4: Dollhouse 3D Floor View
+        bgVilla.style.display = 'none';
+        bgDollhouse.style.display = 'flex';
+        document.getElementById('dock-btn-cube').classList.add('active');
+      } else if (screenNum === 5) {
+        // SCREEN 5: Exit Gallery Confirmation Modal
+        document.getElementById('screen-5').classList.add('active');
+      } else if (screenNum === 6) {
+        // SCREEN 6: Exit Villume Confirmation Modal
+        document.getElementById('screen-6').classList.add('active');
+      } else if (screenNum === 7) {
+        // SCREEN 7: Dashboard Alert Modal
+        document.getElementById('screen-7').classList.add('active');
+      } else if (screenNum === 8) {
+        // SCREEN 8: Welcome to Villume Modal
+        document.getElementById('screen-8').classList.add('active');
+        document.getElementById('dock-btn-help').classList.add('active');
+      }
+
+      // Update URL hash for easy sharing and individual testing
+      history.replaceState(null, null, '#screen-' + screenNum);
+    }
+
+    // Natural Dock Interaction Handler
+    function handleDockClick(action) {
+      if (action === 'cube') {
+        if (activeScreenIndex === 4) {
+          switchShowcaseScreen(1);
+        } else {
+          switchShowcaseScreen(4);
+        }
+      } else if (action === 'help') {
+        switchShowcaseScreen(8);
+      } else if (action === 'prev') {
+        showToast('Navigating to previous gallery room...');
+        switchShowcaseScreen(7);
+      } else if (action === 'play') {
+        isPlaying = !isPlaying;
+        const icon = document.getElementById('play-icon');
+        icon.className = isPlaying ? 'ph ph-pause' : 'ph ph-play';
+        showToast(isPlaying ? 'Autoplay tour started' : 'Tour paused');
+      } else if (action === 'next') {
+        switchShowcaseScreen(3);
+      } else if (action === 'info') {
+        if (activeScreenIndex === 1 && document.getElementById('screen-1').classList.contains('active')) {
+          closeAllModals();
+        } else {
+          switchShowcaseScreen(1);
+        }
+      } else if (action === 'creator') {
+        if (activeScreenIndex === 2 && document.getElementById('screen-2').classList.contains('active')) {
+          closeAllModals();
+        } else {
+          switchShowcaseScreen(2);
+        }
+      }
+    }
+
+    // Init from URL hash or param
     document.addEventListener("DOMContentLoaded", () => {
-      gsap.fromTo("#top-card", 
-        { y: -40, opacity: 0, autoAlpha: 0 }, 
-        { y: 0, opacity: 1, autoAlpha: 1, duration: 0.8, ease: "power3.out", delay: 0.2 }
-      );
-      
-      gsap.fromTo("#bottom-dock", 
-        { y: 40, opacity: 0, autoAlpha: 0 }, 
-        { y: 0, opacity: 1, autoAlpha: 1, duration: 0.8, ease: "power3.out", delay: 0.3 }
-      );
+      const urlParams = new URLSearchParams(window.location.search);
+      const paramTheme = urlParams.get('theme');
+      if (paramTheme && ['light', 'dark'].includes(paramTheme)) {
+        setTheme(paramTheme);
+      } else {
+        const savedTheme = localStorage.getItem('villume_theme');
+        if (savedTheme) {
+          setTheme(savedTheme);
+        }
+      }
+
+      const qScreen = urlParams.get('screen') || urlParams.get('ui');
+      const hash = window.location.hash;
+
+      if (qScreen && Number(qScreen) >= 1 && Number(qScreen) <= 8) {
+        switchShowcaseScreen(Number(qScreen));
+      } else if (hash && hash.startsWith('#screen-')) {
+        const num = parseInt(hash.replace('#screen-', ''), 10);
+        if (num >= 1 && num <= 8) {
+          switchShowcaseScreen(num);
+        } else {
+          switchShowcaseScreen(1);
+        }
+      } else {
+        switchShowcaseScreen(1);
+      }
     });
   </script>
 </body>

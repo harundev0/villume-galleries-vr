@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Villume Galleries VR</title>
-  <link href="assets/css/global.css?v=3" rel="stylesheet">
+  <link href="assets/css/global.css?v=4" rel="stylesheet">
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <style>
@@ -530,99 +530,193 @@
 
           <!-- VIEW 2: ARTISTS DIRECTORY -->
           <div class="view-container" id="view-artists">
-            <div class="section-title">
-              Highlighted Artists
-              <div class="galleries-count" id="artists-count-badge">8 featured</div>
-            </div>
-
-            <div class="artist-grid" id="artists-grid-container">
-              <!-- Esther Howard (Primary Featured) -->
-              <div class="artist-card-custom active" onclick="switchView('artist-detail')">
-                <div class="artist-avatar-wrap">
-                  <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=256&q=80" alt="Esther Howard" class="artist-avatar">
+            <div id="artists-wrapper">
+              <!-- SECTION 1: HIGHLIGHTED ARTISTS -->
+              <div class="highlighted-header">
+                <h2 class="section-title" style="margin-bottom: 0;">Highlighted Artists</h2>
+                <div class="highlighted-controls">
+                  <button class="highlighted-nav-btn prev" id="btn-highlight-prev-gal" onclick="scrollHighlightedGal(-1)" title="Previous"><i class="ph ph-arrow-left"></i></button>
+                  <button class="highlighted-nav-btn next" id="btn-highlight-next-gal" onclick="scrollHighlightedGal(1)" title="Next"><i class="ph ph-arrow-right"></i></button>
                 </div>
-                <div class="artist-info">
-                  <div class="artist-name">Esther Howard</div>
-                  <div class="artist-role">Visual Artist &bull; Subang</div>
+              </div>
+              
+              <div class="artists-circle-row" id="highlighted-artists-row-gal">
+                <!-- 1. Georg Katstaller (Highlighted Active with primary blue ring) -->
+                <div class="artist-circle-item active" onclick="switchView('artist-detail')">
+                  <div class="artist-circle-avatar-wrap active">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80" alt="Georg Katstaller">
+                  </div>
+                  <div class="artist-circle-name">Georg Katstal...</div>
+                  <div class="artist-circle-role">georg_c2</div>
+                </div>
+
+                <!-- 2. Jane Cooper -->
+                <div class="artist-circle-item" onclick="switchView('artist-detail')">
+                  <div class="artist-circle-avatar-wrap">
+                    <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=256&q=80" alt="Jane Cooper">
+                  </div>
+                  <div class="artist-circle-name">Jane Cooper</div>
+                  <div class="artist-circle-role">jane_coo</div>
+                </div>
+
+                <!-- 3. Guy Hawkins -->
+                <div class="artist-circle-item" onclick="switchView('artist-detail')">
+                  <div class="artist-circle-avatar-wrap">
+                    <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=256&q=80" alt="Guy Hawkins">
+                  </div>
+                  <div class="artist-circle-name">Guy Hawkins</div>
+                  <div class="artist-circle-role">guy_haw</div>
+                </div>
+
+                <!-- 4. Guy Hawkins (Placeholder) -->
+                <div class="artist-circle-item" onclick="switchView('artist-detail')">
+                  <div class="artist-circle-avatar-wrap">
+                    <div class="artist-circle-placeholder">
+                      <i class="ph ph-user"></i>
+                    </div>
+                  </div>
+                  <div class="artist-circle-name">Guy Hawkins</div>
+                  <div class="artist-circle-role">guy_haw</div>
+                </div>
+
+                <!-- 5. Cody Fisher -->
+                <div class="artist-circle-item" onclick="switchView('artist-detail')">
+                  <div class="artist-circle-avatar-wrap">
+                    <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=256&q=80" alt="Cody Fisher">
+                  </div>
+                  <div class="artist-circle-name">Cody Fisher</div>
+                  <div class="artist-circle-role">cody_fisher</div>
+                </div>
+
+                <!-- 6. Marvin McKin -->
+                <div class="artist-circle-item" onclick="switchView('artist-detail')">
+                  <div class="artist-circle-avatar-wrap">
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=256&q=80" alt="Marvin McKin">
+                  </div>
+                  <div class="artist-circle-name">Marvin McKin</div>
+                  <div class="artist-circle-role">marvin_mc</div>
                 </div>
               </div>
 
-              <!-- Georg Katstaller -->
-              <div class="artist-card-custom" onclick="openPrototype('Dark Valleys', 'By Georg Katstaller', 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80')">
-                <div class="artist-avatar-wrap">
-                  <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=256&q=80" alt="Georg Katstaller" class="artist-avatar">
+              <!-- SECTION 2: ARTISTS -->
+              <h2 class="section-title" style="margin-top: 36px; margin-bottom: 20px;">Artists</h2>
+              
+              <div class="artists-circle-grid" id="all-artists-grid-gal">
+                <!-- Row 1 -->
+                <!-- 1. Georg Katstaller -->
+                <div class="artist-circle-item" onclick="switchView('artist-detail')">
+                  <div class="artist-circle-avatar-wrap">
+                    <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=256&q=80" alt="Georg Katstaller">
+                  </div>
+                  <div class="artist-circle-name">Georg Katstal...</div>
+                  <div class="artist-circle-role">georg_c2</div>
                 </div>
-                <div class="artist-info">
-                  <div class="artist-name">Georg Katstaller</div>
-                  <div class="artist-role">Photography & Space</div>
+
+                <!-- 2. Jane Cooper -->
+                <div class="artist-circle-item" onclick="switchView('artist-detail')">
+                  <div class="artist-circle-avatar-wrap">
+                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=256&q=80" alt="Jane Cooper">
+                  </div>
+                  <div class="artist-circle-name">Jane Cooper</div>
+                  <div class="artist-circle-role">jane_coo</div>
+                </div>
+
+                <!-- 3. Guy Hawkins -->
+                <div class="artist-circle-item" onclick="switchView('artist-detail')">
+                  <div class="artist-circle-avatar-wrap">
+                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=256&q=80" alt="Guy Hawkins">
+                  </div>
+                  <div class="artist-circle-name">Guy Hawkins</div>
+                  <div class="artist-circle-role">guy_haw</div>
+                </div>
+
+                <!-- 4. Robert Fox -->
+                <div class="artist-circle-item" onclick="switchView('artist-detail')">
+                  <div class="artist-circle-avatar-wrap">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80" alt="Robert Fox">
+                  </div>
+                  <div class="artist-circle-name">Robert Fox</div>
+                  <div class="artist-circle-role">robert_fox</div>
+                </div>
+
+                <!-- 5. Cody Fisher -->
+                <div class="artist-circle-item" onclick="switchView('artist-detail')">
+                  <div class="artist-circle-avatar-wrap">
+                    <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=256&q=80" alt="Cody Fisher">
+                  </div>
+                  <div class="artist-circle-name">Cody Fisher</div>
+                  <div class="artist-circle-role">cody_fisher</div>
+                </div>
+
+                <!-- 6. Marvin McKin -->
+                <div class="artist-circle-item" onclick="switchView('artist-detail')">
+                  <div class="artist-circle-avatar-wrap">
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=256&q=80" alt="Marvin McKin">
+                  </div>
+                  <div class="artist-circle-name">Marvin McKin</div>
+                  <div class="artist-circle-role">marvin_mc</div>
+                </div>
+
+                <!-- Row 2 -->
+                <!-- 7. Guy Hawkins -->
+                <div class="artist-circle-item" onclick="switchView('artist-detail')">
+                  <div class="artist-circle-avatar-wrap">
+                    <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=256&q=80" alt="Guy Hawkins">
+                  </div>
+                  <div class="artist-circle-name">Guy Hawkins</div>
+                  <div class="artist-circle-role">guy_haw</div>
+                </div>
+
+                <!-- 8. Robert Fox -->
+                <div class="artist-circle-item" onclick="switchView('artist-detail')">
+                  <div class="artist-circle-avatar-wrap">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80" alt="Robert Fox">
+                  </div>
+                  <div class="artist-circle-name">Robert Fox</div>
+                  <div class="artist-circle-role">robert_fox</div>
+                </div>
+
+                <!-- 9. Marvin McKin -->
+                <div class="artist-circle-item" onclick="switchView('artist-detail')">
+                  <div class="artist-circle-avatar-wrap">
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=256&q=80" alt="Marvin McKin">
+                  </div>
+                  <div class="artist-circle-name">Marvin McKin</div>
+                  <div class="artist-circle-role">marvin_mc</div>
+                </div>
+
+                <!-- 10. Jane Cooper -->
+                <div class="artist-circle-item" onclick="switchView('artist-detail')">
+                  <div class="artist-circle-avatar-wrap">
+                    <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=256&q=80" alt="Jane Cooper">
+                  </div>
+                  <div class="artist-circle-name">Jane Cooper</div>
+                  <div class="artist-circle-role">jane_coo</div>
+                </div>
+
+                <!-- 11. Guy Hawkins -->
+                <div class="artist-circle-item" onclick="switchView('artist-detail')">
+                  <div class="artist-circle-avatar-wrap">
+                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=256&q=80" alt="Guy Hawkins">
+                  </div>
+                  <div class="artist-circle-name">Guy Hawkins</div>
+                  <div class="artist-circle-role">guy_haw</div>
+                </div>
+
+                <!-- 12. Georg Katstaller -->
+                <div class="artist-circle-item" onclick="switchView('artist-detail')">
+                  <div class="artist-circle-avatar-wrap">
+                    <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=256&q=80" alt="Georg Katstaller">
+                  </div>
+                  <div class="artist-circle-name">Georg Katstal...</div>
+                  <div class="artist-circle-role">georg_c2</div>
                 </div>
               </div>
 
-              <!-- Jane Cooper -->
-              <div class="artist-card-custom" onclick="switchView('artist-detail')">
-                <div class="artist-avatar-wrap">
-                  <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80" alt="Jane Cooper" class="artist-avatar">
-                </div>
-                <div class="artist-info">
-                  <div class="artist-name">Jane Cooper</div>
-                  <div class="artist-role">3D Sculptor</div>
-                </div>
-              </div>
-
-              <!-- Guy Hawkins -->
-              <div class="artist-card-custom" onclick="switchView('artist-detail')">
-                <div class="artist-avatar-wrap">
-                  <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=256&q=80" alt="Guy Hawkins" class="artist-avatar">
-                </div>
-                <div class="artist-info">
-                  <div class="artist-name">Guy Hawkins</div>
-                  <div class="artist-role">Generative Installations</div>
-                </div>
-              </div>
-
-              <!-- Robert Fox -->
-              <div class="artist-card-custom" onclick="switchView('artist-detail')">
-                <div class="artist-avatar-wrap">
-                  <img src="https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=256&q=80" alt="Robert Fox" class="artist-avatar">
-                </div>
-                <div class="artist-info">
-                  <div class="artist-name">Robert Fox</div>
-                  <div class="artist-role">Digital Light & Shadow</div>
-                </div>
-              </div>
-
-              <!-- Cody Fisher -->
-              <div class="artist-card-custom" onclick="switchView('artist-detail')">
-                <div class="artist-avatar-wrap">
-                  <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=256&q=80" alt="Cody Fisher" class="artist-avatar">
-                </div>
-                <div class="artist-info">
-                  <div class="artist-name">Cody Fisher</div>
-                  <div class="artist-role">Interactive Media</div>
-                </div>
-              </div>
-
-              <!-- Marvin McKin -->
-              <div class="artist-card-custom" onclick="switchView('artist-detail')">
-                <div class="artist-avatar-wrap">
-                  <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=256&q=80" alt="Marvin McKin" class="artist-avatar">
-                </div>
-                <div class="artist-info">
-                  <div class="artist-name">Marvin McKin</div>
-                  <div class="artist-role">Mixed Reality</div>
-                </div>
-              </div>
-
-              <!-- Polina Shubkina -->
-              <div class="artist-card-custom" onclick="openPrototype('Stranded', 'By Polina Shubkina', 'https://images.unsplash.com/photo-1549213821-4708d624e1d1?auto=format&fit=crop&w=1200&q=80')">
-                <div class="artist-avatar-wrap">
-                  <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=256&q=80" alt="Polina Shubkina" class="artist-avatar">
-                </div>
-                <div class="artist-info">
-                  <div class="artist-name">Polina Shubkina</div>
-                  <div class="artist-role">Mixed Media & Spatial</div>
-                </div>
-              </div>
+              <!-- Scroll To Top Button -->
+              <button class="scroll-to-top-btn" onclick="scrollToTopGal()" title="Scroll to top">
+                <i class="ph-bold ph-caret-up"></i>
+              </button>
             </div>
           </div>
 
@@ -634,85 +728,106 @@
               </button>
             </div>
 
-            <!-- Profile Hero -->
-            <div class="detail-hero">
-              <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80" alt="Esther Howard" class="detail-cover">
+            <!-- TOP PROFILE CARD (Premium Apple Vision Pro Glassmorphic Style) -->
+            <div class="detail-hero-premium">
+              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80" alt="Esther Howard" class="detail-hero-avatar">
               
-              <div class="detail-info">
-                <h1 class="detail-name">Esther Howard</h1>
-                <div class="detail-tags">
-                  <span class="tag">@esther_howard</span>
-                  <span class="tag">Visual Artist</span>
+              <div class="detail-hero-content">
+                <h1 class="detail-hero-name">Esther Howard</h1>
+                
+                <div class="detail-hero-meta">
+                  <span class="detail-hero-username">esther_howard</span>
+                  <div class="detail-hero-socials">
+                    <a href="#" class="detail-social-btn" aria-label="Facebook"><i class="ph-fill ph-facebook-logo"></i></a>
+                    <a href="#" class="detail-social-btn" aria-label="Instagram"><i class="ph ph-instagram-logo"></i></a>
+                    <a href="#" class="detail-social-btn" aria-label="Website"><i class="ph ph-globe"></i></a>
+                  </div>
                 </div>
 
-                <div class="creator-contact">
-                  <span>
-                    <i class="ph ph-map-pin"></i> Subang, West Java, Indonesia
-                  </span>
-                  <span>
-                    <i class="ph ph-envelope-simple"></i> johndoe@gmail.com
-                  </span>
+                <div class="detail-hero-contact">
+                  <span>Subang, West Java, Indonesia</span>
+                  <span>johndoe@gmail.com</span>
                 </div>
                 
-                <p class="detail-bio">
-                  Lorem ipsum dolor sit amet, consec tetur adipiscing elit. Vivamus efficitur est ex, nec bibendum erat semper in. Ut hendrerit porta ex vitae elem entum. Vestibulum condimentum mauris non leo varius elementum. Donec sed ultricies tellus. Duis eget urna nec urna consectetur malesuada in id ipsum
+                <p class="detail-hero-bio">
+                  Lorem ipsum dolor sit amet, consec tetur adipiscing elit. Vivamus efficitur est ex, nec bibendum erat semper in. Ut hendrerit porta ex vitae elem entum. Vestibulum condimentum mauris non leo varius elementum. Donec sed ultricies tellus. Duis eget urna nec urna consectetur malesuada in id ipsum <span class="show-more-link">Show more &darr;</span>
                 </p>
-                
-                <div style="margin-top: 24px; display: flex; gap: 14px; align-items: center;">
-                  <button class="btn-primary" onclick="showToast('Message sent to Esther Howard')">
-                    <i class="ph ph-paper-plane-tilt"></i> Message
-                  </button>
-                  <a href="#" class="nav-item" style="background:var(--muted); border-radius: var(--radius-full);" aria-label="Facebook"><i class="ph ph-facebook-logo"></i></a>
-                  <a href="#" class="nav-item" style="background:var(--muted); border-radius: var(--radius-full);" aria-label="Instagram"><i class="ph ph-instagram-logo"></i></a>
-                  <a href="#" class="nav-item" style="background:var(--muted); border-radius: var(--radius-full);" aria-label="Website"><i class="ph ph-globe"></i></a>
-                </div>
               </div>
             </div>
 
-            <div class="section-title">
-              Virtual Exhibitions
-              <div class="galleries-count">4 collections</div>
-            </div>
-
-            <!-- 4 Featured Exhibitions -->
-            <div class="master-grid">
-              <div class="media-card" onclick="openPrototype('Dark Valley', 'By Esther Howard', 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=1200&q=80')">
+            <!-- 8 ARTWORK CARDS (4 COLUMNS X 2 ROWS - Premium Media Cards) -->
+            <div class="artworks-grid-4col">
+              <!-- Row 1 -->
+              <div class="media-card" onclick="openPrototype('The Studio Is Opening', 'By Esther Howard', 'assets/images/gallery-dark-valleys-1.png')">
                 <div class="media-img-wrap">
-                  <img src="https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=600&q=80" alt="Dark Valley">
+                  <img src="assets/images/gallery-dark-valleys-1.png" alt="The Studio Is Opening">
                 </div>
                 <div class="media-info">
-                  <span class="media-title">Dark Valley</span>
-                  <span class="media-sub">Virtual Space &bull; Esther Howard</span>
+                  <span class="media-title">The Studio Is Opening</span>
                 </div>
               </div>
 
-              <div class="media-card" onclick="openPrototype('Elysium Horizon', 'By Esther Howard', 'https://images.unsplash.com/photo-1577083288073-40892c0860a4?auto=format&fit=crop&w=1200&q=80')">
+              <div class="media-card" onclick="openPrototype('Dark Valleys', 'By Esther Howard', 'assets/images/gallery-dark-valleys-2.png')">
                 <div class="media-img-wrap">
-                  <img src="https://images.unsplash.com/photo-1577083288073-40892c0860a4?auto=format&fit=crop&w=600&q=80" alt="Elysium Horizon">
+                  <img src="assets/images/gallery-dark-valleys-2.png" alt="Dark Valleys">
                 </div>
                 <div class="media-info">
-                  <span class="media-title">Elysium Horizon</span>
-                  <span class="media-sub">Virtual Space &bull; Esther Howard</span>
+                  <span class="media-title">Dark Valleys</span>
                 </div>
               </div>
 
-              <div class="media-card" onclick="openPrototype('Quiet Monochrome', 'By Esther Howard', 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80')">
+              <div class="media-card" onclick="openPrototype('From Stone to Silicone', 'By Esther Howard', 'assets/images/gallery-dark-valleys-3.png')">
                 <div class="media-img-wrap">
-                  <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80" alt="Quiet Monochrome">
+                  <img src="assets/images/gallery-dark-valleys-3.png" alt="From Stone to Silicone">
                 </div>
                 <div class="media-info">
-                  <span class="media-title">Quiet Monochrome</span>
-                  <span class="media-sub">Virtual Space &bull; Esther Howard</span>
+                  <span class="media-title">From Stone to Silicone</span>
                 </div>
               </div>
 
-              <div class="media-card" onclick="openPrototype('Neon Solitude', 'By Esther Howard', 'https://images.unsplash.com/photo-1549213821-4708d624e1d1?auto=format&fit=crop&w=1200&q=80')">
+              <div class="media-card" onclick="openPrototype('Stranded', 'By Esther Howard', 'assets/images/gallery-dark-valleys-4.png')">
                 <div class="media-img-wrap">
-                  <img src="https://images.unsplash.com/photo-1549213821-4708d624e1d1?auto=format&fit=crop&w=600&q=80" alt="Neon Solitude">
+                  <img src="assets/images/gallery-dark-valleys-4.png" alt="Stranded">
                 </div>
                 <div class="media-info">
-                  <span class="media-title">Neon Solitude</span>
-                  <span class="media-sub">Virtual Space &bull; Esther Howard</span>
+                  <span class="media-title">Stranded</span>
+                </div>
+              </div>
+
+              <!-- Row 2 -->
+              <div class="media-card" onclick="openPrototype('The Studio Is Opening', 'By Esther Howard', 'assets/images/gallery-dark-valleys-1.png')">
+                <div class="media-img-wrap">
+                  <img src="assets/images/gallery-dark-valleys-1.png" alt="The Studio Is Opening">
+                </div>
+                <div class="media-info">
+                  <span class="media-title">The Studio Is Opening</span>
+                </div>
+              </div>
+
+              <div class="media-card" onclick="openPrototype('Dark Valleys', 'By Esther Howard', 'assets/images/gallery-dark-valleys-2.png')">
+                <div class="media-img-wrap">
+                  <img src="assets/images/gallery-dark-valleys-2.png" alt="Dark Valleys">
+                </div>
+                <div class="media-info">
+                  <span class="media-title">Dark Valleys</span>
+                </div>
+              </div>
+
+              <div class="media-card" onclick="openPrototype('From Stone to Silicone', 'By Esther Howard', 'assets/images/gallery-dark-valleys-3.png')">
+                <div class="media-img-wrap">
+                  <img src="assets/images/gallery-dark-valleys-3.png" alt="From Stone to Silicone">
+                </div>
+                <div class="media-info">
+                  <span class="media-title">From Stone to Silicone</span>
+                </div>
+              </div>
+
+              <div class="media-card" onclick="openPrototype('Stranded', 'By Esther Howard', 'assets/images/gallery-dark-valleys-4.png')">
+                <div class="media-img-wrap">
+                  <img src="assets/images/gallery-dark-valleys-4.png" alt="Stranded">
+                </div>
+                <div class="media-info">
+                  <span class="media-title">Stranded</span>
                 </div>
               </div>
             </div>
@@ -773,15 +888,15 @@
                 <div id="setting-tab-navigation" style="display: flex; flex-direction: column; gap: 20px; width: 100%;">
                   
                   <!-- Top VR Controller Diagram Card -->
-                  <div class="help-info-card" style="padding: 24px 20px; display: flex; align-items: center; justify-content: center; background: rgba(22, 22, 28, 0.7);">
+                  <div class="help-info-card setting-card" style="padding: 24px 20px; display: flex; align-items: center; justify-content: center;">
                     <img id="setting-controller-img" src="assets/icons/navigation-full-motion.svg" alt="VR Controllers Navigation Diagram" style="max-height: 250px; width: 100%; object-fit: contain;">
                   </div>
 
                   <!-- Bottom Controls & Description Card -->
-                  <div class="help-info-card" style="padding: 24px 28px; background: rgba(22, 22, 28, 0.7); display: flex; flex-direction: column; align-items: center; text-align: center;">
+                  <div class="help-info-card setting-card" style="padding: 24px 28px; display: flex; flex-direction: column; align-items: center; text-align: center;">
                     
                     <!-- Motion Mode Pill Toggle -->
-                    <div style="display: inline-flex; background: rgba(255, 255, 255, 0.08); padding: 4px; border-radius: var(--radius-md); gap: 4px; border: 1px solid var(--border-subtle);">
+                    <div class="setting-motion-wrap" style="display: inline-flex; padding: 4px; border-radius: var(--radius-md); gap: 4px;">
                       <button class="setting-motion-toggle-btn active" id="setting-btn-fullmotion" onclick="setSettingMotionMode('full')">Full Motion</button>
                       <button class="setting-motion-toggle-btn" id="setting-btn-comfortmotion" onclick="setSettingMotionMode('comfort')">Comfort Motion</button>
                     </div>
@@ -807,11 +922,11 @@
 
                 <!-- LANGUAGE SETTINGS TAB (MATCHING REFERENCE IMAGE 1) -->
                 <div id="setting-tab-language" style="display: none; flex-direction: column; gap: 16px; width: 100%;">
-                  <div class="help-info-card" style="padding: 24px; background: rgba(22, 22, 28, 0.7); display: flex; flex-direction: column; gap: 18px; text-align: left;">
+                  <div class="help-info-card setting-card" style="padding: 24px; display: flex; flex-direction: column; gap: 18px; text-align: left;">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                       <div>
-                        <div style="font-size: 16px; font-weight: 600; color: #ffffff;">Language</div>
-                        <div style="font-size: 13px; color: var(--muted-foreground); margin-top: 2px;">Select your preferred interface language</div>
+                        <div class="setting-header-title" style="font-size: 16px; font-weight: 600;">Language</div>
+                        <div class="setting-header-sub" style="font-size: 13px; margin-top: 2px;">Select your preferred interface language</div>
                       </div>
                       <span id="current-lang-indicator" style="background: rgba(64, 118, 245, 0.15); color: #4076F5; border: 1px solid rgba(64, 118, 245, 0.3); font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 16px;">English</span>
                     </div>
@@ -1438,17 +1553,23 @@
       const controlsArea = document.getElementById('header-controls-area');
       const searchInput = document.getElementById('search-input');
 
+      const filterGroup = document.getElementById('filter-group-container');
+
       if (viewName === 'galleries') {
         titleEl.textContent = 'Galleries';
         controlsArea.style.display = 'flex';
+        if (filterGroup) filterGroup.style.display = 'block';
         searchInput.placeholder = 'Search Gallery...';
       } else if (viewName === 'artists') {
-        titleEl.textContent = 'Creators & Artists';
+        titleEl.textContent = 'Artists';
         controlsArea.style.display = 'flex';
+        if (filterGroup) filterGroup.style.display = 'none';
         searchInput.placeholder = 'Search artist...';
       } else if (viewName === 'artist-detail') {
-        titleEl.textContent = 'Artist Profile';
-        controlsArea.style.display = 'none';
+        titleEl.textContent = 'Artist';
+        controlsArea.style.display = 'flex';
+        if (filterGroup) filterGroup.style.display = 'none';
+        searchInput.placeholder = 'Search artist';
       } else if (viewName === 'help') {
         titleEl.textContent = 'Help & Guides';
         controlsArea.style.display = 'none';
@@ -1457,11 +1578,28 @@
       } else if (viewName === 'settings') {
         titleEl.textContent = 'Setting';
         controlsArea.style.display = 'none';
-        selectSettingTab('navigation');
+        const urlTab = new URLSearchParams(window.location.search).get('tab');
+        selectSettingTab(urlTab === 'language' ? 'language' : 'navigation');
       }
 
       // Update Hash
       window.location.hash = viewName;
+    }
+
+    // Artists Scroll Helpers
+    function scrollHighlightedGal(direction) {
+      const container = document.getElementById('highlighted-artists-row-gal');
+      if (container) {
+        container.scrollBy({ left: direction * 280, behavior: 'smooth' });
+      }
+    }
+
+    function scrollToTopGal() {
+      const board = document.querySelector('.board-content');
+      if (board) {
+        board.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     // Help Tab Selection
