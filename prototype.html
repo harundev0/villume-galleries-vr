@@ -260,100 +260,162 @@
       color: #fff;
     }
 
-    .card-creator-row {
+    .gallery-hero-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .gallery-meta-left {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .gallery-curator-row {
       display: flex;
       align-items: center;
-      gap: 16px;
-      margin-bottom: 14px;
+      gap: 8px;
     }
 
-    .card-creator-avatar {
-      width: 54px;
-      height: 54px;
-      border-radius: 50%;
-      object-fit: cover;
-      display: block;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .card-creator-avatar.sm {
+    .curator-avatar-icon {
       width: 24px;
       height: 24px;
+      border-radius: 50%;
+      background: #2b2b32;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      color: #cbd5e1;
     }
 
     .card-social-icons {
       display: flex;
       align-items: center;
-      gap: 10px;
-      margin-top: 6px;
+      gap: 8px;
     }
 
-    .card-social-icons a {
-      color: #fff;
-      opacity: 0.8;
-      font-size: 15px;
-      text-decoration: none;
-      transition: opacity 0.2s, color 0.2s;
-    }
-    .card-social-icons a:hover {
-      opacity: 1;
-      color: var(--villume-blue);
-    }
-
-    .card-body-text {
-      font-size: 13px;
-      color: #b0b0b5;
-      line-height: 1.55;
-      margin-bottom: 20px;
-    }
-
-    .card-body-text .show-more {
-      color: #ffffff;
-      font-weight: 600;
-      cursor: pointer;
-      text-decoration: none;
-      margin-left: 4px;
-    }
-
-    /* Share Bar in Screen 1 */
-    .share-section-label {
-      font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-
-    .share-bar-group {
+    .social-icon-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: center;
+      color: #e2e8f0;
+      font-size: 15px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .social-icon-btn:hover {
+      background: rgba(64, 118, 245, 0.2);
+      border-color: var(--villume-blue);
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    .share-gallery-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 14px 16px;
       margin-bottom: 24px;
+    }
+
+    .share-section-label {
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #94a3b8;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .share-input-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
     .share-input-box {
       flex: 1;
-      background: #141416;
+      background: rgba(0, 0, 0, 0.35);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 6px;
-      padding: 8px 12px;
-      font-size: 12.5px;
-      color: #8e8e93;
+      border-radius: 8px;
+      padding: 9px 14px;
+      font-size: 13px;
+      color: #e2e8f0;
       outline: none;
       user-select: all;
     }
 
-    .btn-share-pill {
-      background: #4a4a50;
-      color: #ffffff;
-      border: none;
-      border-radius: 999px;
-      padding: 8px 18px;
-      font-size: 12.5px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background 0.2s ease;
+    .share-buttons-dock {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
+
+    .btn-share-pill {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      border-radius: 8px;
+      padding: 9px 16px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
     .btn-share-pill:hover {
-      background: #5d5d65;
+      background: rgba(255, 255, 255, 0.16);
+      transform: translateY(-1px);
+    }
+
+    /* Creator Profile Header */
+    .creator-hero-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+
+    .creator-hero-profile {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .creator-contacts-bar {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      font-size: 13px;
+      color: #94a3b8;
+      margin-bottom: 14px;
+    }
+
+    .creator-contacts-bar span {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .creator-contacts-bar span i {
+      color: var(--villume-blue);
+      font-size: 15px;
     }
 
     /* 4x2 Media Card Grid matching Dashboard component */
@@ -487,28 +549,24 @@
     .dialog-confirm-card {
       width: 440px;
       max-width: 90vw;
-      background: #8e8e92;
-      border-radius: 8px;
-      padding: 36px 32px 32px 32px;
-      color: #1a1a1a;
-      box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+      background: #1c1c22;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 32px 28px;
+      color: #ffffff;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65);
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
     }
 
-    .dialog-confirm-card.blue-focus {
-      border: 2px solid var(--villume-blue);
-      box-shadow: 0 0 24px var(--villume-blue-glow), 0 24px 60px rgba(0,0,0,0.6);
-    }
-
     .dialog-text {
       font-size: 16px;
-      font-weight: 500;
-      color: #1a1a1a;
+      font-weight: 600;
+      color: #ffffff;
       line-height: 1.45;
-      margin-bottom: 28px;
+      margin-bottom: 24px;
     }
 
     .dialog-actions {
@@ -769,10 +827,6 @@
       box-shadow: 0 28px 70px rgba(0, 0, 0, 0.22) !important;
       color: #0f172a !important;
     }
-    body[data-theme="light"] .dialog-confirm-card.blue-focus {
-      border: 2px solid var(--villume-blue) !important;
-      box-shadow: 0 0 24px var(--villume-blue-glow), 0 28px 70px rgba(0, 0, 0, 0.22) !important;
-    }
     body[data-theme="light"] .dialog-text {
       color: #0f172a !important;
       font-weight: 600 !important;
@@ -790,6 +844,25 @@
       background: var(--villume-blue) !important;
       color: #ffffff !important;
       font-weight: 700 !important;
+    }
+
+    body[data-theme="light"] .share-gallery-box {
+      background: #f8fafc !important;
+      border-color: #cbd5e1 !important;
+    }
+    body[data-theme="light"] .social-icon-btn {
+      background: #f1f5f9 !important;
+      border-color: rgba(0, 0, 0, 0.1) !important;
+      color: #334155 !important;
+    }
+    body[data-theme="light"] .social-icon-btn:hover {
+      background: rgba(64, 118, 245, 0.15) !important;
+      border-color: var(--villume-blue) !important;
+      color: var(--villume-blue) !important;
+    }
+    body[data-theme="light"] .curator-avatar-icon {
+      background: #e2e8f0 !important;
+      color: #475569 !important;
     }
 
     /* Screen 8 Welcome Modal in Light Mode */
@@ -948,35 +1021,40 @@
           <button class="btn-close-modal" onclick="closeAllModals()"><i class="ph ph-x"></i></button>
         </div>
 
-        <div class="card-main-title" style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">Gallery Title</div>
-        
-        <div class="card-creator-row">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <div style="width: 22px; height: 22px; border-radius: 50%; background: #333; display: flex; align-items: center; justify-content: center; font-size: 13px;">
-              <i class="ph ph-user"></i>
+        <div class="gallery-hero-header">
+          <div class="gallery-meta-left">
+            <h2 class="card-main-title" style="font-size: 24px; font-weight: 700; letter-spacing: -0.02em;">Gallery Title</h2>
+            <div class="gallery-curator-row">
+              <div class="curator-avatar-icon">
+                <i class="ph ph-user"></i>
+              </div>
+              <span class="card-creator-subtitle" style="font-size: 13.5px; font-weight: 500;">by full name</span>
             </div>
-            <span class="card-creator-subtitle" style="font-size: 13px;">by full name</span>
+          </div>
+          
+          <div class="card-social-icons">
+            <a href="#" class="social-icon-btn" aria-label="Facebook"><i class="ph-fill ph-facebook-logo"></i></a>
+            <a href="#" class="social-icon-btn" aria-label="Instagram"><i class="ph ph-instagram-logo"></i></a>
+            <a href="#" class="social-icon-btn" aria-label="Website"><i class="ph ph-globe"></i></a>
           </div>
         </div>
 
-        <div class="card-social-icons" style="margin-bottom: 16px;">
-          <a href="#" aria-label="Facebook"><i class="ph-fill ph-facebook-logo"></i></a>
-          <a href="#" aria-label="Instagram"><i class="ph ph-instagram-logo"></i></a>
-          <a href="#" aria-label="Website"><i class="ph ph-globe"></i></a>
-        </div>
-
-        <p class="card-body-text">
+        <p class="card-body-text" style="font-size: 13.5px; line-height: 1.6; margin-bottom: 18px;">
           Lorem ipsum dolor sit amet, consec tetur adipiscing elit. Vivamus efficitur est ex, nec bibendum erat semper in. Ut hendrerit porta ex vitae elem entum. Vestibulum condimentum mauris non leo varius elementum. Donec sed ultricies tellus. Duis eget urna nec urna consectetur malesuada in id ipsum <span class="show-more" onclick="showToast('Showing full exhibition description')">Show more &darr;</span>
         </p>
 
-        <div class="share-section-label">Share Gallery</div>
-        <div class="share-bar-group">
-          <input type="text" class="share-input-box" id="share-input-field" value="https://gallery.villume.com/" readonly>
-          <button class="btn-share-pill" onclick="copyShareLink()">Copy</button>
-          <button class="btn-share-pill" onclick="showToast('Exhibition shared!')">Share</button>
+        <div class="share-gallery-box">
+          <span class="share-section-label">Share Gallery</span>
+          <div class="share-input-wrapper">
+            <input type="text" class="share-input-box" id="share-input-field" value="https://gallery.villume.com/" readonly>
+            <div class="share-buttons-dock">
+              <button class="btn-share-pill" onclick="copyShareLink()">Copy</button>
+              <button class="btn-share-pill" style="background: var(--villume-blue); color: #fff; border-color: var(--villume-blue);" onclick="showToast('Exhibition shared!')">Share</button>
+            </div>
+          </div>
         </div>
 
-        <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 16px; margin-bottom: 8px;">
+        <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 18px; margin-bottom: 8px;">
         <div class="card-section-label" style="font-size: 13.5px; font-weight: 600; margin-bottom: 10px;">List of Artwork</div>
           <div class="grid-artworks-8">
             <div class="media-card" onclick="switchShowcaseScreen(3)">
@@ -1022,27 +1100,33 @@
           <button class="btn-close-modal" onclick="closeAllModals()"><i class="ph ph-x"></i></button>
         </div>
 
-        <div class="card-creator-row">
-          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80" alt="Esther Howard" class="card-creator-avatar">
-          <div>
-            <div class="card-main-title" style="font-size: 18px; font-weight: 700;">Esther Howard</div>
-            <div style="font-size: 13px; color: #8e8e93; margin-top: 2px;">esther_howard</div>
-            <div class="card-social-icons">
-              <a href="#" aria-label="Facebook"><i class="ph-fill ph-facebook-logo"></i></a>
-              <a href="#" aria-label="Instagram"><i class="ph ph-instagram-logo"></i></a>
-              <a href="#" aria-label="Website"><i class="ph ph-globe"></i></a>
+        <div class="creator-hero-header">
+          <div class="creator-hero-profile">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80" alt="Esther Howard" class="card-creator-avatar" style="width: 58px; height: 58px;">
+            <div>
+              <div class="card-main-title" style="font-size: 20px; font-weight: 700; margin-bottom: 2px;">Esther Howard</div>
+              <div style="font-size: 13.5px; color: #94a3b8; font-weight: 500;">esther_howard</div>
             </div>
+          </div>
+
+          <div class="card-social-icons">
+            <a href="#" class="social-icon-btn" aria-label="Facebook"><i class="ph-fill ph-facebook-logo"></i></a>
+            <a href="#" class="social-icon-btn" aria-label="Instagram"><i class="ph ph-instagram-logo"></i></a>
+            <a href="#" class="social-icon-btn" aria-label="Website"><i class="ph ph-globe"></i></a>
           </div>
         </div>
 
-        <div class="card-contact-line" style="font-size: 13px; margin-bottom: 4px;">Subang, West Java, Indonesia</div>
-        <div class="card-contact-line" style="font-size: 13px; margin-bottom: 14px;">johndoe@gmail.com</div>
+        <div class="creator-contacts-bar">
+          <span class="card-contact-line">Subang, West Java, Indonesia</span>
+          <span style="opacity: 0.3;">&bull;</span>
+          <span class="card-contact-line">johndoe@gmail.com</span>
+        </div>
 
-        <p class="card-body-text">
+        <p class="card-body-text" style="font-size: 13.5px; line-height: 1.6; margin-bottom: 20px;">
           Lorem ipsum dolor sit amet, consec tetur adipiscing elit. Vivamus efficitur est ex, nec bibendum erat semper in. Ut hendrerit porta ex vitae elem entum. Vestibulum condimentum mauris non leo varius elementum. Donec sed ultricies tellus. Duis eget urna nec urna consectetur malesuada in id ipsum <span class="show-more" onclick="showToast('Showing full creator bio')">Show more &darr;</span>
         </p>
 
-        <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 16px; margin-bottom: 8px;">
+        <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 18px; margin-bottom: 8px;">
           <div class="card-section-label" style="font-size: 13.5px; font-weight: 600; margin-bottom: 10px;">Galleries</div>
           <div class="grid-artworks-8">
             <div class="media-card" onclick="switchShowcaseScreen(3)">
@@ -1091,7 +1175,7 @@
       </div>
 
       <!-- SCREEN 6: EXIT VILLUME CONFIRM MODAL (Image 6) -->
-      <div class="modal-window dialog-confirm-card blue-focus" id="screen-6">
+      <div class="modal-window dialog-confirm-card" id="screen-6">
         <div class="dialog-text">Are you sure you want to exit Villume?</div>
         <div class="dialog-actions">
           <button class="btn-dialog-default" onclick="window.location.href='galleries.html'">Yes</button>
