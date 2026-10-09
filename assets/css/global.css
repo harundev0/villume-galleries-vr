@@ -1227,11 +1227,11 @@ body.immersive-home .spatial-bottom-dock {
 }
 
 .lang-btn.active {
-  background: #FFC700 !important;
-  color: #101012 !important;
-  font-weight: 700 !important;
-  border-color: #FFC700 !important;
-  box-shadow: 0 4px 14px rgba(255, 199, 0, 0.32);
+  background: #4076F5 !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  border-color: #4076F5 !important;
+  box-shadow: 0 4px 16px rgba(64, 118, 245, 0.38);
 }
 
 .lang-flag-icon {
