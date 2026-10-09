@@ -1857,7 +1857,6 @@
         fullBtns.forEach(b => b.classList.add('active'));
         comfortBtns.forEach(b => b.classList.remove('active'));
         radiosRows.forEach(r => r.style.display = 'flex');
-        imgs.forEach(i => i.src = 'assets/icons/navigation-full-motion.svg');
         setSettingRotationMode(currentRotationMode);
       } else {
         fullBtns.forEach(b => b.classList.remove('active'));
@@ -1865,7 +1864,7 @@
         radiosRows.forEach(r => r.style.display = 'none');
         imgs.forEach(i => i.src = 'assets/icons/navigation-comfort-motion.svg');
         descs.forEach(d => {
-          d.textContent = "Comfort motion provides teleportation and segmented movement designed to minimize motion sickness while preserving full spatial awareness within the virtual gallery rooms.";
+          d.textContent = "Comfort motion mode is a navigation mode designed to provide comfort to users while navigating inside the gallery room. This mode features player movement and rotation, where the player moves by teleportation to user-designated spots and rotates in 30-degree increments. Similar to full motion, comfort motion also allows users to interact with artworks, such as approaching or being approached by artworks. You can open the control bar to get a clear view of the gallery room and access the dashboard to see all the menu options available in Villume.";
         });
       }
     }
@@ -1873,10 +1872,23 @@
     function setSettingRotationMode(rotMode) {
       currentRotationMode = rotMode;
       const descs = document.querySelectorAll('#setting-motion-desc');
-      const text = rotMode === 'snap'
-        ? "Full motion snap rotation is a navigation mode where rotation occurs in 30-degree increments, providing a segmented turning experience. In this mode, users have complete control over movement and rotation within the gallery room. The movement is designed to replicate real-world walking simulations, enhancing immersion. Additionally, users can interact with artworks by approaching or being approached by them. The control bar can be toggled for a clear view of the gallery room, and the dashboard offers access to all menu options in Villume."
-        : "Smooth motion is a continuous locomotion mode where movement and rotation occur smoothly without snap intervals, designed for experienced VR users seeking seamless continuous movement throughout the gallery space.";
-      descs.forEach(d => d.textContent = text);
+      const imgs = document.querySelectorAll('#setting-controller-img');
+      const snapRadios = document.querySelectorAll('input[name="setting-rot-choice"][value="snap"], input[name="rotation-mode"][value="snap"]');
+      const smoothRadios = document.querySelectorAll('input[name="setting-rot-choice"][value="smooth"], input[name="rotation-mode"][value="smooth"]');
+
+      if (rotMode === 'snap') {
+        snapRadios.forEach(r => r.checked = true);
+        smoothRadios.forEach(r => r.checked = false);
+        imgs.forEach(i => i.src = 'assets/icons/navigation-full-motion.svg');
+        const text = "Full motion snap rotation is a navigation mode where rotation occurs in 30-degree increments, providing a segmented turning experience. In this mode, users have complete control over movement and rotation within the gallery room. The movement is designed to replicate real-world walking simulations, enhancing immersion. Additionally, users can interact with artworks by approaching or being approached by them. The control bar can be toggled for a clear view of the gallery room, and the dashboard offers access to all menu options in Villume.";
+        descs.forEach(d => d.textContent = text);
+      } else {
+        snapRadios.forEach(r => r.checked = false);
+        smoothRadios.forEach(r => r.checked = true);
+        imgs.forEach(i => i.src = 'assets/icons/navigation-full-motion.svg');
+        const text = "Full Motion smooth rotation is navigation mode that features seamless rotation following the analog rotate controller's movements.  In this mode, users have complete control over movement and rotation within the gallery room. The movement is designed to replicate real-world walking simulations, enhancing immersion. . Users have the freedom to move and rotate within the gallery room as they explore artworks. Similar to full snap motion, users can utilize the control bar for an unobstructed view and access the dashboard for menu options in Villume.";
+        descs.forEach(d => d.textContent = text);
+      }
     }
 
     function selectSettingTab(tabKey) {
