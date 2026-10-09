@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Artist Profile - Villume VR</title>
+  <link href="assets/css/global.css" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <style>
+    .creator-contact {
+      display: flex;
+      gap: 24px;
+      font-size: 15px;
+      color: var(--muted-foreground);
+      font-weight: 500;
+      flex-wrap: wrap;
+      margin-top: 16px;
+      margin-bottom: 24px;
+    }
+    .creator-contact span {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="vr-environment">
+    <div class="vr-bg-overlay" id="vr-bg"></div>
+    
+    <div class="vr-workspace">
+      
+      <!-- Spatial Left Dock Navigation (Apple Vision Pro Style) -->
+      <nav class="nav-dock-left glass-panel fade-up" id="dock-left">
+        <a href="galleries.html#home" class="nav-item" title="Home"><i class="ph ph-house"></i></a>
+        <a href="galleries.html" class="nav-item" title="Galleries"><i class="ph ph-image"></i></a>
+        <a href="artists.html" class="nav-item active" title="Artists & Creators"><i class="ph ph-users"></i></a>
+        <a href="galleries.html#help" class="nav-item" title="Help & Guides"><i class="ph ph-question"></i></a>
+        <button class="nav-item" id="settings-dock-btn" title="Settings" onclick="openSettingsModal()"><i class="ph ph-gear"></i></button>
+        <div style="width: 24px; height: 1px; background: var(--border-subtle); margin: 4px 0;"></div>
+        <button class="nav-item" id="theme-toggle" title="Toggle Theme"><i class="ph ph-sun-dim" id="theme-icon"></i></button>
+      </nav>
+
+      <!-- Main Center Board -->
+      <main class="main-board glass-panel fade-up" id="main-window">
+        
+        <header class="board-header">
+          <div class="header-left">
+            <div class="window-controls">
+              <div class="win-dot"></div>
+              <div class="win-dot"></div>
+              <div class="win-dot"></div>
+            </div>
+            <a href="artists.html" class="back-nav" style="margin-bottom: 0;">
+              <i class="ph ph-caret-left"></i> Back to Artists
+            </a>
+          </div>
+          
+          <button class="nav-item" style="border-radius:var(--radius-full); width:40px; height:40px;" title="Options">
+            <i class="ph ph-dots-three"></i>
+          </button>
+        </header>
+
+        <div class="board-content">
+          
+          <div class="detail-hero stagger-item">
+            <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=500&q=80" alt="Esther Howard" class="detail-cover">
+            
+            <div class="detail-info">
+              <h1 class="detail-name">Esther Howard</h1>
+              <div class="detail-tags">
+                <span class="tag">@esther_howard</span>
+              </div>
+
+              <!-- EXACT Contact details restored -->
+              <div class="creator-contact">
+                <span>
+                  <i class="ph ph-map-pin"></i> Subang, West Java, Indonesia
+                </span>
+                <span>
+                  <i class="ph ph-envelope-simple"></i> johndoe@gmail.com
+                </span>
+              </div>
+              
+              <!-- EXACT Bio restored -->
+              <p class="detail-bio">
+                Lorem ipsum dolor sit amet, consec tetur adipiscing elit. Vivamus efficitur est ex, nec bibendum erat semper in. Ut hendrerit porta ex vitae elem entum. Vestibulum condimentum mauris non leo varius elementum. Donec sed ultricies tellus. Duis eget urna nec urna consectetur malesuada in id ipsum 
+              </p>
+              
+              <div style="margin-top: 32px; display: flex; gap: 16px;">
+                <a href="#" class="btn-primary">Message</a>
+                <a href="#" class="nav-item" style="background:var(--muted); border-radius: var(--radius-full);" aria-label="Facebook"><i class="ph ph-facebook-logo"></i></a>
+                <a href="#" class="nav-item" style="background:var(--muted); border-radius: var(--radius-full);" aria-label="Instagram"><i class="ph ph-instagram-logo"></i></a>
+                <a href="#" class="nav-item" style="background:var(--muted); border-radius: var(--radius-full);" aria-label="Website"><i class="ph ph-globe"></i></a>
+              </div>
+            </div>
+          </div>
+
+          <h2 class="section-title stagger-item">Virtual Exhibitions</h2>
+          
+          <!-- Exact 4 cards restored -->
+          <div class="master-grid">
+            
+            <a href="prototype.html" style="text-decoration: none; color: inherit;">
+              <div class="media-card stagger-item">
+                <div class="media-img-wrap">
+                  <img src="https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=600&q=80" alt="Gallery" />
+                </div>
+                <div class="media-info">
+                  <span class="media-title">Esther Howard</span>
+                  <span class="media-sub">Dark Valley</span>
+                </div>
+              </div>
+            </a>
+            
+            <a href="prototype.html" style="text-decoration: none; color: inherit;">
+              <div class="media-card stagger-item">
+                <div class="media-img-wrap">
+                  <img src="https://images.unsplash.com/photo-1577083288073-40892c0860a4?auto=format&fit=crop&w=600&q=80" alt="Gallery" />
+                </div>
+                <div class="media-info">
+                  <span class="media-title">Esther Howard</span>
+                  <span class="media-sub">Elysium Horizon</span>
+                </div>
+              </div>
+            </a>
+
+            <a href="prototype.html" style="text-decoration: none; color: inherit;">
+              <div class="media-card stagger-item">
+                <div class="media-img-wrap">
+                  <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80" alt="Gallery" />
+                </div>
+                <div class="media-info">
+                  <span class="media-title">Esther Howard</span>
+                  <span class="media-sub">Quiet Monochrome</span>
+                </div>
+              </div>
+            </a>
+
+            <a href="prototype.html" style="text-decoration: none; color: inherit;">
+              <div class="media-card stagger-item">
+                <div class="media-img-wrap">
+                  <img src="https://images.unsplash.com/photo-1549213821-4708d624e1d1?auto=format&fit=crop&w=600&q=80" alt="Gallery" />
+                </div>
+                <div class="media-info">
+                  <span class="media-title">Esther Howard</span>
+                  <span class="media-sub">Neon Solitude</span>
+                </div>
+              </div>
+            </a>
+
+          </div>
+        </div>
+      </main>
+
+      <!-- Right Dock (Controls/Settings) -->
+      <aside class="control-dock-right glass-panel fade-up" id="dock-right">
+        <div class="widget-module">
+          <div class="widget-header">
+            <span>Environment</span>
+            <i class="ph ph-cube"></i>
+          </div>
+          <div class="slider-container">
+            <i class="ph ph-sun" style="color: var(--muted-foreground);"></i>
+            <input type="range" min="1" max="100" value="70" class="slider" aria-label="Lighting">
+            <i class="ph ph-sun-dim"></i>
+          </div>
+        </div>
+
+        <div class="widget-module">
+          <div class="widget-header">
+            <span>Audio Ambience</span>
+            <i class="ph ph-speaker-high"></i>
+          </div>
+          <div class="slider-container">
+            <i class="ph ph-speaker-low" style="color: var(--muted-foreground);"></i>
+            <input type="range" min="1" max="100" value="40" class="slider" aria-label="Volume">
+            <i class="ph ph-speaker-high"></i>
+          </div>
+          <div style="font-size: 13px; color: var(--muted-foreground); margin-top: 8px; display:flex; align-items:center; gap:8px;">
+            <i class="ph ph-music-notes"></i> Lo-Fi Rain
+          </div>
+        </div>
+        
+        <div class="widget-module" style="margin-top: auto;">
+          <div class="widget-header">
+            <span>System Status</span>
+            <i class="ph ph-info"></i>
+          </div>
+          <div style="display: flex; gap: 12px; margin-top: 8px;">
+             <button class="nav-item" style="width:40px; height:40px;"><i class="ph ph-wifi-high"></i></button>
+             <button class="nav-item" style="width:40px; height:40px;"><i class="ph ph-battery-full"></i></button>
+             <button class="nav-item" style="width:40px; height:40px;"><i class="ph ph-headset"></i></button>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+
+  <!-- STANDALONE SETTINGS MODAL (VISION PRO SPATIAL PREFERENCES) -->
+  <div class="nav-modal-backdrop" id="settings-modal" onclick="if(event.target === this) closeSettingsModal()">
+    <div class="nav-modal-card" style="max-width: 600px;">
+      <div class="nav-modal-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <i class="ph ph-gear" style="font-size: 22px; color: var(--primary);"></i>
+          <div>
+            <div class="nav-modal-title">System Settings</div>
+            <div style="font-size: 12px; color: var(--muted-foreground); margin-top: 1px;">Spatial Computing Preferences</div>
+          </div>
+        </div>
+        <button class="nav-modal-close" onclick="closeSettingsModal()"><i class="ph ph-x"></i></button>
+      </div>
+      <div class="nav-modal-body" style="padding: 24px; max-height: 72vh; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; text-align: left; align-items: stretch;">
+        
+        <!-- Environment & Immersion -->
+        <div class="settings-group">
+          <div class="settings-group-title"><i class="ph ph-cube"></i> Environment & Immersion</div>
+          
+          <div class="settings-row">
+            <div class="settings-label">
+              <span class="settings-name">Immersion Level</span>
+              <span class="settings-desc">Adjust spatial environment backdrop blur</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px; width: 170px;">
+              <input type="range" min="10" max="100" value="80" id="setting-immersion-range" oninput="updateImmersionSetting(this.value)" style="flex:1; accent-color: var(--primary); cursor: pointer;">
+              <span id="setting-immersion-val" style="font-size: 13px; font-weight: 600; width: 36px; text-align: right;">80%</span>
+            </div>
+          </div>
+
+          <div class="settings-row">
+            <div class="settings-label">
+              <span class="settings-name">Virtual Backdrop</span>
+              <span class="settings-desc">Select ambient gallery atmosphere</span>
+            </div>
+            <div class="settings-pill-group">
+              <button class="settings-pill active" onclick="setBackdropPreset('dark', this)">Studio</button>
+              <button class="settings-pill" onclick="setBackdropPreset('cyber', this)">Cyber</button>
+              <button class="settings-pill" onclick="setBackdropPreset('void', this)">Void</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Locomotion & Navigation -->
+        <div class="settings-group">
+          <div class="settings-group-title"><i class="ph ph-game-controller"></i> VR Locomotion</div>
+          
+          <div class="settings-row">
+            <div class="settings-label">
+              <span class="settings-name">Navigation Mode</span>
+              <span class="settings-desc">Preferred walkthrough motion in VR</span>
+            </div>
+            <div class="settings-pill-group">
+              <button class="settings-pill" id="setting-loco-teleport" onclick="setLocomotionSetting('teleport')">Teleport</button>
+              <button class="settings-pill active" id="setting-loco-fly" onclick="setLocomotionSetting('fly')">Fly</button>
+              <button class="settings-pill" id="setting-loco-walk" onclick="setLocomotionSetting('walk')">Walk</button>
+            </div>
+          </div>
+
+          <div class="settings-row">
+            <div class="settings-label">
+              <span class="settings-name">Snap Turn Angle</span>
+              <span class="settings-desc">Controller yaw turning increment</span>
+            </div>
+            <div class="settings-pill-group">
+              <button class="settings-pill" onclick="setSnapAngle(15, this)">15°</button>
+              <button class="settings-pill active" onclick="setSnapAngle(30, this)">30°</button>
+              <button class="settings-pill" onclick="setSnapAngle(45, this)">45°</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Display & Audio -->
+        <div class="settings-group">
+          <div class="settings-group-title"><i class="ph ph-sliders"></i> Display & Spatial Audio</div>
+          
+          <div class="settings-row">
+            <div class="settings-label">
+              <span class="settings-name">Interface Theme</span>
+              <span class="settings-desc">Spatial Glass dark/light appearance</span>
+            </div>
+            <div class="settings-pill-group">
+              <button class="settings-pill active" id="setting-theme-dark" onclick="applySettingTheme('dark')">Dark</button>
+              <button class="settings-pill" id="setting-theme-light" onclick="applySettingTheme('light')">Light</button>
+            </div>
+          </div>
+
+          <div class="settings-row">
+            <div class="settings-label">
+              <span class="settings-name">Ambient Sound Volume</span>
+              <span class="settings-desc">Gallery background acoustic level</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px; width: 170px;">
+              <input type="range" min="0" max="100" value="70" id="setting-volume-range" oninput="updateVolumeSetting(this.value)" style="flex:1; accent-color: var(--primary); cursor: pointer;">
+              <span id="setting-volume-val" style="font-size: 13px; font-weight: 600; width: 36px; text-align: right;">70%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Footer -->
+        <div style="display: flex; justify-content: flex-end; gap: 12px; padding-top: 10px; border-top: 1px solid var(--border-subtle);">
+          <button class="btn-sm" style="background: var(--muted); color: var(--foreground); border-radius: var(--radius-full); padding: 8px 18px; border: 1px solid var(--border-subtle); cursor: pointer;" onclick="resetSettingsDefaults()">Reset Defaults</button>
+          <button class="btn-primary" style="padding: 8px 22px; font-size: 13.5px;" onclick="closeSettingsModal()"><i class="ph ph-check"></i> Save & Close</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="share-toast" id="toast-notify">Notification</div>
+
+  <script>
+    // Theme Management
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+
+    function setTheme(theme) {
+      document.body.setAttribute('data-theme', theme);
+      if (themeIcon) {
+        themeIcon.className = theme === 'light' ? 'ph ph-moon' : 'ph ph-sun-dim';
+      }
+      localStorage.setItem('villume_theme', theme);
+      const darkBtn = document.getElementById('setting-theme-dark');
+      const lightBtn = document.getElementById('setting-theme-light');
+      if (darkBtn && lightBtn) {
+        darkBtn.classList.toggle('active', theme === 'dark');
+        lightBtn.classList.toggle('active', theme === 'light');
+      }
+    }
+
+    if (themeToggleBtn) {
+      themeToggleBtn.addEventListener('click', () => {
+        const current = document.body.getAttribute('data-theme') || 'dark';
+        const next = current === 'dark' ? 'light' : 'dark';
+        setTheme(next);
+      });
+    }
+
+    // Settings Modal Handlers
+    function openSettingsModal() {
+      const modal = document.getElementById('settings-modal');
+      if (modal) modal.classList.add('show');
+      const currentTheme = document.body.getAttribute('data-theme') || 'dark';
+      const darkBtn = document.getElementById('setting-theme-dark');
+      const lightBtn = document.getElementById('setting-theme-light');
+      if (darkBtn && lightBtn) {
+        darkBtn.classList.toggle('active', currentTheme === 'dark');
+        lightBtn.classList.toggle('active', currentTheme === 'light');
+      }
+    }
+
+    function closeSettingsModal() {
+      const modal = document.getElementById('settings-modal');
+      if (modal) modal.classList.remove('show');
+    }
+
+    function updateImmersionSetting(val) {
+      const valEl = document.getElementById('setting-immersion-val');
+      if (valEl) valEl.textContent = val + '%';
+      const bg = document.getElementById('vr-bg');
+      if (bg) bg.style.filter = `blur(${Math.max(10, 40 * (val / 100))}px) brightness(${0.5 + (val / 200)})`;
+    }
+
+    function setBackdropPreset(preset, btn) {
+      if (btn && btn.parentElement) {
+        btn.parentElement.querySelectorAll('.settings-pill').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+      }
+      const bg = document.getElementById('vr-bg');
+      if (bg) {
+        if (preset === 'cyber') {
+          bg.style.backgroundImage = 'radial-gradient(circle at 50% 50%, rgba(30, 20, 60, 0.8), rgba(5, 5, 15, 0.95))';
+        } else if (preset === 'void') {
+          bg.style.backgroundImage = 'radial-gradient(circle at 50% 50%, rgba(15, 15, 20, 0.9), rgba(0, 0, 0, 0.98))';
+        } else {
+          bg.style.backgroundImage = '';
+        }
+      }
+      showToast('Backdrop environment: ' + preset.toUpperCase());
+    }
+
+    function setLocomotionSetting(mode) {
+      ['teleport', 'fly', 'walk'].forEach(m => {
+        const el = document.getElementById('setting-loco-' + m);
+        if (el) el.classList.toggle('active', m === mode);
+      });
+      showToast('Locomotion mode: ' + mode.toUpperCase());
+    }
+
+    function setSnapAngle(deg, btn) {
+      if (btn && btn.parentElement) {
+        btn.parentElement.querySelectorAll('.settings-pill').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+      }
+      showToast('Snap rotation: ' + deg + '°');
+    }
+
+    function applySettingTheme(theme) {
+      setTheme(theme);
+    }
+
+    function updateVolumeSetting(val) {
+      const volEl = document.getElementById('setting-volume-val');
+      if (volEl) volEl.textContent = val + '%';
+    }
+
+    function resetSettingsDefaults() {
+      updateImmersionSetting(80);
+      const immRange = document.getElementById('setting-immersion-range');
+      if (immRange) immRange.value = 80;
+      updateVolumeSetting(70);
+      const volRange = document.getElementById('setting-volume-range');
+      if (volRange) volRange.value = 70;
+      setLocomotionSetting('fly');
+      applySettingTheme('dark');
+      showToast('Settings reset to defaults');
+    }
+
+    // Toast Notification Helper
+    function showToast(msg) {
+      const toast = document.getElementById('toast-notify');
+      if (toast) {
+        toast.textContent = msg;
+        toast.style.display = 'block';
+        setTimeout(() => {
+          toast.style.display = 'none';
+        }, 2500);
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      // Restore theme
+      const urlParams = new URLSearchParams(window.location.search);
+      const paramTheme = urlParams.get('theme');
+      if (paramTheme && ['light', 'dark'].includes(paramTheme)) {
+        setTheme(paramTheme);
+      } else {
+        const savedTheme = localStorage.getItem('villume_theme');
+        if (savedTheme) {
+          setTheme(savedTheme);
+        }
+      }
+
+      gsap.fromTo("#dock-left", 
+        { x: -50, opacity: 0, autoAlpha: 0 }, 
+        { x: 0, opacity: 1, autoAlpha: 1, duration: 1, ease: "power4.out", delay: 0.1 }
+      );
+      
+      gsap.fromTo("#main-window", 
+        { scale: 0.95, opacity: 0, autoAlpha: 0, y: 20 }, 
+        { scale: 1, opacity: 1, autoAlpha: 1, y: 0, duration: 1.2, ease: "expo.out", delay: 0.2 }
+      );
+
+      gsap.fromTo("#dock-right", 
+        { x: 50, opacity: 0, autoAlpha: 0 }, 
+        { x: 0, opacity: 1, autoAlpha: 1, duration: 1, ease: "power4.out", delay: 0.3 }
+      );
+
+      gsap.fromTo(".stagger-item", 
+        { y: 30, opacity: 0 }, 
+        { y: 0, opacity: 1, stagger: 0.08, duration: 0.8, ease: "power3.out", delay: 0.5 }
+      );
+
+      if (new URLSearchParams(window.location.search).has('instant')) {
+        gsap.globalTimeline.seek(10);
+      }
+      if (window.location.hash === '#settings') {
+        openSettingsModal();
+      }
+    });
+  </script>
+</body>
+</html>

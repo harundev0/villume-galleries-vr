@@ -1,0 +1,50 @@
+<svg viewBox="0 0 280 180" fill="none" xmlns="http://www.w3.org/2000/svg" style="max-height: 140px; width: auto;">
+  <!-- Cylinder Wall Back -->
+  <path d="M 38 68 C 38 35 242 35 242 68 L 242 122 C 242 89 38 89 38 122 Z" fill="#54565c" stroke="#343538" stroke-width="3"/>
+  
+  <!-- Outer rim shadow / depth -->
+  <path d="M 38 68 C 38 35 242 35 242 68 L 242 75 C 242 42 38 42 38 75 Z" fill="#44464c"/>
+
+  <!-- Screen Panels / Artwork frames on the curved wall -->
+  <!-- Left panel -->
+  <path d="M 52 64 C 55 58 75 54 85 53 L 85 96 C 75 97 55 101 52 107 Z" fill="#787a82" opacity="0.85"/>
+  <!-- Circle indicators / lights -->
+  <circle cx="106" cy="62" r="6" fill="#787a82" stroke="#383a3e" stroke-width="2"/>
+  <circle cx="128" cy="62" r="6" fill="#787a82" stroke="#383a3e" stroke-width="2"/>
+  <!-- Middle-right panel -->
+  <path d="M 148 53 C 158 54 175 58 178 63 L 178 106 C 175 101 158 97 148 96 Z" fill="#787a82" opacity="0.85"/>
+  <!-- Far right panel -->
+  <path d="M 200 68 C 205 73 216 82 222 90 L 222 126 C 216 118 205 109 200 104 Z" fill="#787a82" opacity="0.85"/>
+
+  <!-- Front Curved Opening (Cylinder cutoff) -->
+  <path d="M 38 68 C 38 105 70 148 70 148 L 40 134 C 40 134 38 85 38 68 Z" fill="#606268" stroke="#343538" stroke-width="2"/>
+  <path d="M 242 68 C 242 105 210 148 210 148 L 240 134 C 240 134 242 85 242 68 Z" fill="#606268" stroke="#343538" stroke-width="2"/>
+
+  <!-- Center Floor Shadow -->
+  <ellipse cx="140" cy="146" rx="42" ry="10" fill="#2a2b2f" opacity="0.6"/>
+
+  <!-- Person Body (Viewed from back) -->
+  <!-- Left Arm raised diagonally -->
+  <path d="M 124 102 L 76 68" stroke="#72757e" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 124 102 L 76 68" stroke="#38393e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- Left hand -->
+  <circle cx="70" cy="64" r="8" fill="#e8ad82" stroke="#38393e" stroke-width="2.5"/>
+
+  <!-- Right Arm raised diagonally -->
+  <path d="M 156 102 L 188 78 L 188 70" stroke="#72757e" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 156 102 L 188 78 L 188 70" stroke="#38393e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- Right hand -->
+  <rect x="182" y="62" width="12" height="15" rx="6" fill="#e8ad82" stroke="#38393e" stroke-width="2.5"/>
+
+  <!-- Torso -->
+  <path d="M 120 96 C 120 90 130 84 140 84 C 150 84 160 90 160 96 L 164 142 L 116 142 Z" fill="#72757e" stroke="#38393e" stroke-width="3"/>
+  
+  <!-- Belt / base -->
+  <rect x="115" y="142" width="50" height="12" rx="2" fill="#565961" stroke="#38393e" stroke-width="2.5"/>
+
+  <!-- Neck -->
+  <rect x="134" y="74" width="12" height="12" fill="#e2a67e" stroke="#38393e" stroke-width="2"/>
+
+  <!-- Head (Back of head) -->
+  <rect x="127" y="52" width="26" height="28" rx="13" fill="#ba7c55" stroke="#38393e" stroke-width="3"/>
+</svg>

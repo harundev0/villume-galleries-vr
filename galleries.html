@@ -1,0 +1,1956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Villume Galleries VR</title>
+  <link href="assets/css/global.css" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <style>
+    /* In-page interactive additions */
+    .view-container {
+      display: none;
+      width: 100%;
+    }
+    .view-container.active-view {
+      display: block;
+      animation: fadeInView 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes fadeInView {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Immersive Prototype Overlay */
+    .prototype-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 500;
+      background: #000000;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      overflow: hidden;
+    }
+    .prototype-overlay.active {
+      display: flex;
+    }
+    .prototype-video-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: brightness(0.65);
+      z-index: 0;
+    }
+    .prototype-top-hud {
+      position: absolute;
+      top: 36px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--glass-bg);
+      backdrop-filter: blur(40px) saturate(140%);
+      -webkit-backdrop-filter: blur(40px) saturate(140%);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: 18px 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      z-index: 10;
+      box-shadow: var(--glass-shadow);
+      text-align: center;
+    }
+    .prototype-info-drawer {
+      position: absolute;
+      top: 120px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 820px;
+      max-width: 90vw;
+      max-height: calc(100vh - 240px);
+      overflow-y: auto;
+      background: var(--glass-bg);
+      backdrop-filter: blur(48px) saturate(140%);
+      -webkit-backdrop-filter: blur(48px) saturate(140%);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-xl);
+      padding: 32px;
+      z-index: 10;
+      display: none;
+      box-shadow: var(--glass-shadow);
+    }
+    .prototype-info-drawer.show {
+      display: block;
+      animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .dock-horizontal {
+      background: var(--glass-bg);
+      backdrop-filter: blur(40px) saturate(140%);
+      -webkit-backdrop-filter: blur(40px) saturate(140%);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      border-radius: var(--radius-full);
+      padding: 10px 22px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      z-index: 20;
+      margin-bottom: 32px;
+    }
+    .share-toast {
+      position: fixed;
+      top: 28px;
+      right: 28px;
+      bottom: auto;
+      background: rgba(24, 24, 30, 0.9);
+      backdrop-filter: blur(24px);
+      border: 1px solid var(--border-subtle);
+      color: #fff;
+      padding: 10px 22px;
+      border-radius: var(--radius-full);
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      z-index: 2000;
+      display: none;
+      animation: fadeInDown 0.2s;
+    }
+  </style>
+</head>
+<body data-theme="dark">
+
+  <div class="vr-environment">
+    <div class="vr-bg-overlay" id="vr-bg"></div>
+    
+    <div class="vr-workspace">
+      
+      <!-- Spatial Left Dock Navigation (Apple Vision Pro Style) -->
+      <nav class="nav-dock-left glass-panel fade-up" id="dock-left">
+        <div class="dock-brand-logo" title="Villume VR" onclick="switchView('galleries')">
+          <svg width="22" height="22" viewBox="0 0 66 66" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M66 0H15L0 15V66H51L66 51V0Z" fill="#ffffff"/>
+          </svg>
+        </div>
+        <div style="width: 24px; height: 1px; background: var(--border-subtle); margin: 2px 0 6px 0;"></div>
+        <button class="nav-item" data-view="home" title="Home">
+          <i class="ph ph-house"></i>
+        </button>
+        <button class="nav-item active" data-view="galleries" title="Galleries">
+          <i class="ph ph-image"></i>
+        </button>
+        <button class="nav-item" data-view="artists" title="Artists & Creators">
+          <i class="ph ph-users"></i>
+        </button>
+        <button class="nav-item" data-view="help" title="Help & Guides">
+          <i class="ph ph-question"></i>
+        </button>
+        <button class="nav-item" id="settings-dock-btn" data-view="settings" title="Settings" onclick="switchView('settings')">
+          <i class="ph ph-gear"></i>
+        </button>
+        <div style="width: 24px; height: 1px; background: var(--border-subtle); margin: 4px 0;"></div>
+        <button class="nav-item" id="theme-toggle" title="Toggle Theme">
+          <i class="ph ph-sun-dim" id="theme-icon"></i>
+        </button>
+      </nav>
+
+      <!-- Main Center Glass Window -->
+      <main class="main-board glass-panel fade-up" id="main-window">
+        
+        <!-- Header Bar -->
+        <header class="board-header">
+          <div class="header-left">
+            <div class="window-controls">
+              <div class="win-dot" style="background:#ff5f56;" title="Close"></div>
+              <div class="win-dot" style="background:#ffbd2e;" title="Minimize"></div>
+              <div class="win-dot" style="background:#27c93f;" title="Expand"></div>
+            </div>
+            <div class="board-title" id="board-title-text">Galleries</div>
+          </div>
+          
+          <div class="header-controls" id="header-controls-area">
+            <!-- Search Bar -->
+            <div class="header-search">
+              <i class="ph ph-magnifying-glass"></i>
+              <input type="text" id="search-input" placeholder="Search Gallery...">
+            </div>
+
+            <!-- Filter Dropdown -->
+            <div class="filter-group" id="filter-group-container">
+              <button class="filter-btn" id="filterDropdownBtn">
+                <span id="current-filter-label">All Exhibitions</span>
+                <i class="ph ph-sliders-horizontal"></i>
+              </button>
+              <div class="dropdown-menu" id="filterDropdownMenu">
+                <div class="dropdown-item active" data-filter="all">All Exhibitions</div>
+                <div class="dropdown-item" data-filter="Alexandria">Alexandria</div>
+                <div class="dropdown-item" data-filter="Hokkaido">Hokkaido</div>
+                <div class="dropdown-item" data-filter="Nippon">Nippon</div>
+                <div class="dropdown-item" data-filter="Fjord">Fjord</div>
+                <div class="dropdown-item" data-filter="Brooklyn">Brooklyn</div>
+                <div class="dropdown-item" data-filter="Belfast">Belfast</div>
+                <div class="dropdown-item" data-filter="Pueblo">Pueblo</div>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- Dynamic Content Scroll Area -->
+        <div class="board-content" id="board-content-area">
+          
+          <!-- VIEW 1: GALLERIES -->
+          <div class="view-container active-view" id="view-galleries">
+            
+            <!-- Loading State -->
+            <div class="empty-state" id="loading-state">
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
+                <div id="loading-percentage" style="font-size: 16px; font-weight: 600; color: var(--foreground); letter-spacing: 0.05em;">0%</div>
+                <svg width="60" height="60" viewBox="0 0 66 66" fill="none" xmlns="http://www.w3.org/2000/svg" style="animation: pulse-loading 1.2s infinite;">
+                  <path d="M66 0H15L0 15V66H51L66 51V0Z" fill="currentColor" opacity="0.8"/>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Empty Search State -->
+            <div class="empty-state" id="empty-state">
+              <div class="empty-search-text">Search Gallery for "<span id="search-query-text" style="color:var(--foreground); font-weight:700;"></span>"</div>
+              <svg class="empty-state-visual" width="180" height="180" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="spotlight" x1="100" y1="0" x2="100" y2="180" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="currentColor" stop-opacity="0.22" />
+                    <stop offset="1" stop-color="currentColor" stop-opacity="0" />
+                  </linearGradient>
+                </defs>
+                <path d="M80 0 L120 0 L160 160 L40 160 Z" fill="url(#spotlight)" />
+                <g stroke="currentColor" stroke-width="1" stroke-linejoin="round" opacity="0.3">
+                  <path d="M100 120 L145 145 L100 170 L55 145 Z" fill="currentColor" fill-opacity="0.1" />
+                  <path d="M55 145 L100 170 L100 180 L55 155 Z" fill="currentColor" fill-opacity="0.4" />
+                  <path d="M145 145 L100 170 L100 180 L145 155 Z" fill="currentColor" fill-opacity="0.05" />
+                </g>
+                <g style="animation: float-lens 6s ease-in-out infinite;">
+                  <circle cx="100" cy="72" r="42" stroke="currentColor" stroke-width="1.5" stroke-dasharray="12 30 4 30" stroke-linecap="round" fill="none">
+                    <animateTransform attributeName="transform" type="rotate" from="0 100 72" to="360 100 72" dur="16s" repeatCount="indefinite" />
+                  </circle>
+                  <circle cx="100" cy="72" r="28" fill="var(--panel-bg)" stroke="currentColor" stroke-width="3" />
+                  <path d="M82 72 H118 M100 54 V90" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2 6" stroke-linecap="round" opacity="0.4" />
+                  <circle cx="92" cy="64" r="3" fill="currentColor" opacity="0.8" />
+                  <path d="M 120 92 L 138 110" stroke="currentColor" stroke-width="5" stroke-linecap="round" />
+                </g>
+              </svg>
+            </div>
+
+            <!-- Galleries Content List -->
+            <div id="galleries-wrapper">
+              
+              <!-- SECTION 1: HIGHLIGHTED GALLERIES -->
+              <section class="galleries-section" id="section-highlighted">
+                <div class="section-header-flex">
+                  <h2 class="section-heading">Highlighted Galleries</h2>
+                  <div class="carousel-nav">
+                    <button class="carousel-nav-btn" id="highlight-prev-btn" title="Previous" onclick="slideHighlightCarousel(-1)">
+                      <i class="ph ph-arrow-left"></i>
+                    </button>
+                    <button class="carousel-nav-btn btn-active-blue" id="highlight-next-btn" title="Next" onclick="slideHighlightCarousel(1)">
+                      <i class="ph ph-arrow-right"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="highlighted-carousel-container">
+                  <div class="highlighted-carousel-track" id="highlighted-carousel-track">
+                    
+                    <!-- Card 1: Georg Katstaller / Dark Valleys -->
+                    <div class="media-card" data-tags="Georg Katstaller Dark Valleys VR Gallery" onclick="openPrototype('Dark Valleys', 'By Georg Katstaller', 'assets/images/dark-valley-1.png')">
+                      <div class="media-img-wrap">
+                        <img src="assets/images/dark-valley-1.png" alt="Dark Valleys">
+                      </div>
+                      <div class="media-info">
+                        <span class="media-title">Georg Katstaller</span>
+                        <span class="media-sub">Dark Valleys</span>
+                      </div>
+                    </div>
+
+                    <!-- Card 2: Georg Katstaller / Dark Valleys (Active Blue) -->
+                    <div class="media-card card-active-blue" data-tags="Georg Katstaller Dark Valleys Featured VR" onclick="openPrototype('Dark Valleys', 'By Georg Katstaller', 'assets/images/dark-valley-2.png')">
+                      <div class="media-img-wrap">
+                        <img src="assets/images/dark-valley-2.png" alt="Dark Valleys">
+                      </div>
+                      <div class="media-info">
+                        <span class="media-title">Georg Katstaller</span>
+                        <span class="media-sub">Dark Valleys</span>
+                      </div>
+                    </div>
+
+                    <!-- Card 3: Georg Katstaller / Dark Valleys (Blue Text Accent) -->
+                    <div class="media-card card-blue-text" data-tags="Georg Katstaller Dark Valleys Architecture" onclick="openPrototype('Dark Valleys', 'By Georg Katstaller', 'assets/images/dark-valley-3.png')">
+                      <div class="media-img-wrap">
+                        <img src="assets/images/dark-valley-3.png" alt="Dark Valleys">
+                      </div>
+                      <div class="media-info">
+                        <span class="media-title">Georg Katstaller</span>
+                        <span class="media-sub">Dark Valleys</span>
+                      </div>
+                    </div>
+
+                    <!-- Card 4: Georg Katstaller / Dark Valleys -->
+                    <div class="media-card" data-tags="Georg Katstaller Dark Valleys Timber Space" onclick="openPrototype('Dark Valleys', 'By Georg Katstaller', 'assets/images/dark-valley-4.png')">
+                      <div class="media-img-wrap">
+                        <img src="assets/images/dark-valley-4.png" alt="Dark Valleys">
+                      </div>
+                      <div class="media-info">
+                        <span class="media-title">Georg Katstaller</span>
+                        <span class="media-sub">Dark Valleys</span>
+                      </div>
+                    </div>
+
+                    <!-- Card 5 (Additional in Carousel): Mahakarya Lukisan -->
+                    <div class="media-card" data-tags="Mahakarya Lukisan Interactive Space Alexandria" onclick="openPrototype('Mahakarya Lukisan', 'Interactive Space', 'https://images.unsplash.com/photo-1549213821-4708d624e1d1?auto=format&fit=crop&w=1200&q=80')">
+                      <div class="media-img-wrap">
+                        <span class="status-tag live">LIVE</span>
+                        <img src="https://images.unsplash.com/photo-1549213821-4708d624e1d1?auto=format&fit=crop&w=600&q=80" alt="Mahakarya Lukisan">
+                      </div>
+                      <div class="media-info">
+                        <span class="media-title">Mahakarya Lukisan</span>
+                        <span class="media-sub">Interactive Space &bull; Alexandria</span>
+                      </div>
+                    </div>
+
+                    <!-- Card 6 (Additional in Carousel): From Stone to Silicone -->
+                    <div class="media-card" data-tags="From Stone to Silicone Interactive Space Nippon Villume" onclick="openPrototype('From Stone to Silicone', 'Villume &bull; Interactive Space', 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=1200&q=80')">
+                      <div class="media-img-wrap">
+                        <span class="status-tag live">LIVE</span>
+                        <img src="https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=600&q=80" alt="From Stone to Silicone">
+                      </div>
+                      <div class="media-info">
+                        <span class="media-title">From Stone to Silicone</span>
+                        <span class="media-sub">Interactive Space &bull; Nippon</span>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </section>
+
+              <!-- SECTION 2: EXPLORE GALLERIES -->
+              <section class="galleries-section" id="section-explore">
+                <div class="section-header-flex">
+                  <h2 class="section-heading">Explore Galleries</h2>
+                  <div class="galleries-count" id="galleries-counter-badge">29 galleries</div>
+                </div>
+                
+                <div class="master-grid" id="main-galleries-grid">
+                  <!-- Row 1: Matching Reference (Georg Katstaller / Dark Valleys series) -->
+                  <div class="media-card" data-tags="Georg Katstaller Dark Valleys Alexandria" onclick="openPrototype('Dark Valleys', 'By Georg Katstaller', 'assets/images/dark-valley-1.png')">
+                    <div class="media-img-wrap">
+                      <img src="assets/images/dark-valley-1.png" alt="Dark Valleys">
+                    </div>
+                    <div class="media-info">
+                      <span class="media-title">Georg Katstaller</span>
+                      <span class="media-sub">Dark Valleys</span>
+                    </div>
+                  </div>
+
+                  <div class="media-card" data-tags="Georg Katstaller Dark Valleys Hokkaido" onclick="openPrototype('Dark Valleys', 'By Georg Katstaller', 'assets/images/dark-valley-2.png')">
+                    <div class="media-img-wrap">
+                      <img src="assets/images/dark-valley-2.png" alt="Dark Valleys">
+                    </div>
+                    <div class="media-info">
+                      <span class="media-title">Georg Katstaller</span>
+                      <span class="media-sub">Dark Valleys</span>
+                    </div>
+                  </div>
+
+                  <div class="media-card" data-tags="Georg Katstaller Dark Valleys Nippon" onclick="openPrototype('Dark Valleys', 'By Georg Katstaller', 'assets/images/dark-valley-3.png')">
+                    <div class="media-img-wrap">
+                      <img src="assets/images/dark-valley-3.png" alt="Dark Valleys">
+                    </div>
+                    <div class="media-info">
+                      <span class="media-title">Georg Katstaller</span>
+                      <span class="media-sub">Dark Valleys</span>
+                    </div>
+                  </div>
+
+                  <div class="media-card" data-tags="Georg Katstaller Dark Valleys Fjord" onclick="openPrototype('Dark Valleys', 'By Georg Katstaller', 'assets/images/dark-valley-4.png')">
+                    <div class="media-img-wrap">
+                      <img src="assets/images/dark-valley-4.png" alt="Dark Valleys">
+                    </div>
+                    <div class="media-info">
+                      <span class="media-title">Georg Katstaller</span>
+                      <span class="media-sub">Dark Valleys</span>
+                    </div>
+                  </div>
+
+                  <!-- Row 2: Comprehensive VR Exhibitions -->
+                  <div class="media-card" data-tags="Mahakarya Lukisan Interactive Space Alexandria" onclick="openPrototype('Mahakarya Lukisan', 'Interactive Space', 'https://images.unsplash.com/photo-1549213821-4708d624e1d1?auto=format&fit=crop&w=1200&q=80')">
+                    <div class="media-img-wrap">
+                      <span class="status-tag live">LIVE</span>
+                      <img src="https://images.unsplash.com/photo-1549213821-4708d624e1d1?auto=format&fit=crop&w=600&q=80" alt="Mahakarya Lukisan">
+                    </div>
+                    <div class="media-info">
+                      <span class="media-title">Mahakarya Lukisan</span>
+                      <span class="media-sub">Interactive Space &bull; Alexandria</span>
+                    </div>
+                  </div>
+
+                  <div class="media-card" data-tags="The Studio Dark Valleys Hokkaido Georg Katstaller" onclick="openPrototype('Dark Valleys', 'The Studio &bull; Georg Katstaller', 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80')">
+                    <div class="media-img-wrap">
+                      <span class="status-tag draft">DRAFT</span>
+                      <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80" alt="The Studio">
+                    </div>
+                    <div class="media-info">
+                      <span class="media-title">The Studio</span>
+                      <span class="media-sub">Dark Valleys &bull; Hokkaido</span>
+                    </div>
+                  </div>
+
+                  <div class="media-card" data-tags="From Stone to Silicone Interactive Space Nippon Villume" onclick="openPrototype('From Stone to Silicone', 'Villume &bull; Interactive Space', 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=1200&q=80')">
+                    <div class="media-img-wrap">
+                      <span class="status-tag live">LIVE</span>
+                      <img src="https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=600&q=80" alt="From Stone to Silicone">
+                    </div>
+                    <div class="media-info">
+                      <span class="media-title">From Stone to Silicone</span>
+                      <span class="media-sub">Interactive Space &bull; Nippon</span>
+                    </div>
+                  </div>
+
+                  <div class="media-card" data-tags="Quiet Monochrome Space Light Fjord Esther Howard" onclick="openPrototype('Quiet Monochrome', 'Space & Light &bull; Esther Howard', 'https://images.unsplash.com/photo-1577083288073-40892c0860a4?auto=format&fit=crop&w=1200&q=80')">
+                    <div class="media-img-wrap">
+                      <img src="https://images.unsplash.com/photo-1577083288073-40892c0860a4?auto=format&fit=crop&w=600&q=80" alt="Quiet Monochrome">
+                    </div>
+                    <div class="media-info">
+                      <span class="media-title">Quiet Monochrome</span>
+                      <span class="media-sub">Space & Light &bull; Fjord</span>
+                    </div>
+                  </div>
+
+                  <!-- Row 3 -->
+                  <div class="media-card" data-tags="Neon Solitude Modern VR Architecture Brooklyn Esther Howard" onclick="openPrototype('Neon Solitude', 'Modern Architecture &bull; Esther Howard', 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=1200&q=80')">
+                    <div class="media-img-wrap">
+                      <span class="status-tag live">LIVE</span>
+                      <img src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=600&q=80" alt="Neon Solitude">
+                    </div>
+                    <div class="media-info">
+                      <span class="media-title">Neon Solitude</span>
+                      <span class="media-sub">Modern Architecture &bull; Brooklyn</span>
+                    </div>
+                  </div>
+
+                  <div class="media-card" data-tags="Elysium Horizon Surreal Spatial Landscapes Belfast" onclick="openPrototype('Elysium Horizon', 'Surreal Spatial Landscapes &bull; Belfast', 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80')">
+                    <div class="media-img-wrap">
+                      <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80" alt="Elysium Horizon">
+                    </div>
+                    <div class="media-info">
+                      <span class="media-title">Elysium Horizon</span>
+                      <span class="media-sub">Spatial Landscapes &bull; Belfast</span>
+                    </div>
+                  </div>
+
+                  <div class="media-card" data-tags="Digital Genesis Geometric Sculptures Pueblo" onclick="openPrototype('Digital Genesis', 'Geometric Sculptures &bull; Pueblo', 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=1200&q=80')">
+                    <div class="media-img-wrap">
+                      <img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=600&q=80" alt="Digital Genesis">
+                    </div>
+                    <div class="media-info">
+                      <span class="media-title">Digital Genesis</span>
+                      <span class="media-sub">Geometric Sculptures &bull; Pueblo</span>
+                    </div>
+                  </div>
+
+                  <div class="media-card" data-tags="Metaphysical Space Conceptual Design Alexandria" onclick="openPrototype('Metaphysical Space', 'Conceptual Design &bull; Alexandria', 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=1200&q=80')">
+                    <div class="media-img-wrap">
+                      <span class="status-tag draft">DRAFT</span>
+                      <img src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=600&q=80" alt="Metaphysical Space">
+                    </div>
+                    <div class="media-info">
+                      <span class="media-title">Metaphysical Space</span>
+                      <span class="media-sub">Conceptual Design &bull; Alexandria</span>
+                    </div>
+                  </div>
+
+                  <!-- Row 4 -->
+                  <div class="media-card" data-tags="Temporal Shift Digital Installation Hokkaido" onclick="openPrototype('Temporal Shift', 'Digital Installation &bull; Hokkaido', 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1200&q=80')">
+                    <div class="media-img-wrap">
+                      <img src="https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=600&q=80" alt="Temporal Shift">
+                    </div>
+                    <div class="media-info">
+                      <span class="media-title">Temporal Shift</span>
+                      <span class="media-sub">Digital Installation &bull; Hokkaido</span>
+                    </div>
+                  </div>
+
+                  <div class="media-card" data-tags="Prism Void Abstract Glassmorphism Nippon" onclick="openPrototype('Prism & Void', 'Abstract Glassmorphism &bull; Nippon', 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=1200&q=80')">
+                    <div class="media-img-wrap">
+                      <span class="status-tag live">LIVE</span>
+                      <img src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=600&q=80" alt="Prism & Void">
+                    </div>
+                    <div class="media-info">
+                      <span class="media-title">Prism & Void</span>
+                      <span class="media-sub">Abstract Design &bull; Nippon</span>
+                    </div>
+                  </div>
+
+                  <div class="media-card" data-tags="Chromatics Audio-Reactive Environment Fjord" onclick="openPrototype('Chromatics', 'Audio-Reactive Environment &bull; Fjord', 'https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17?auto=format&fit=crop&w=1200&q=80')">
+                    <div class="media-img-wrap">
+                      <img src="https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17?auto=format&fit=crop&w=600&q=80" alt="Chromatics">
+                    </div>
+                    <div class="media-info">
+                      <span class="media-title">Chromatics</span>
+                      <span class="media-sub">Reactive Space &bull; Fjord</span>
+                    </div>
+                  </div>
+
+                  <!-- Coming Soon Card -->
+                  <div class="media-card" style="border: 1px dashed var(--border); background: transparent; cursor: default;">
+                    <div class="coming-soon-content">
+                      <i class="ph ph-cube" style="font-size: 28px; opacity: 0.6; margin-bottom: 8px;"></i>
+                      <span style="font-size: 13px; font-weight: 600; color: var(--foreground);">Next Exhibition</span>
+                      <span style="font-size: 11px; color: var(--muted-foreground); margin-top: 4px;">Coming Soon in VR</span>
+                    </div>
+                    <div class="media-img-wrap" style="opacity: 0;"></div>
+                    <div class="media-info" style="opacity: 0;">
+                      <span class="media-title">Coming Soon</span>
+                      <span class="media-sub">Villume VR</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="display: flex; justify-content: center; margin-top: 24px;">
+                  <button class="load-more-btn" id="load-more-galleries-btn">
+                    Load More Exhibitions
+                  </button>
+                </div>
+              </section>
+
+            </div>
+          </div>
+
+          <!-- VIEW 2: ARTISTS DIRECTORY -->
+          <div class="view-container" id="view-artists">
+            <div class="section-title">
+              Highlighted Artists
+              <div class="galleries-count" id="artists-count-badge">8 featured</div>
+            </div>
+
+            <div class="artist-grid" id="artists-grid-container">
+              <!-- Esther Howard (Primary Featured) -->
+              <div class="artist-card-custom active" onclick="switchView('artist-detail')">
+                <div class="artist-avatar-wrap">
+                  <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=256&q=80" alt="Esther Howard" class="artist-avatar">
+                </div>
+                <div class="artist-info">
+                  <div class="artist-name">Esther Howard</div>
+                  <div class="artist-role">Visual Artist &bull; Subang</div>
+                </div>
+              </div>
+
+              <!-- Georg Katstaller -->
+              <div class="artist-card-custom" onclick="openPrototype('Dark Valleys', 'By Georg Katstaller', 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80')">
+                <div class="artist-avatar-wrap">
+                  <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=256&q=80" alt="Georg Katstaller" class="artist-avatar">
+                </div>
+                <div class="artist-info">
+                  <div class="artist-name">Georg Katstaller</div>
+                  <div class="artist-role">Photography & Space</div>
+                </div>
+              </div>
+
+              <!-- Jane Cooper -->
+              <div class="artist-card-custom" onclick="switchView('artist-detail')">
+                <div class="artist-avatar-wrap">
+                  <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80" alt="Jane Cooper" class="artist-avatar">
+                </div>
+                <div class="artist-info">
+                  <div class="artist-name">Jane Cooper</div>
+                  <div class="artist-role">3D Sculptor</div>
+                </div>
+              </div>
+
+              <!-- Guy Hawkins -->
+              <div class="artist-card-custom" onclick="switchView('artist-detail')">
+                <div class="artist-avatar-wrap">
+                  <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=256&q=80" alt="Guy Hawkins" class="artist-avatar">
+                </div>
+                <div class="artist-info">
+                  <div class="artist-name">Guy Hawkins</div>
+                  <div class="artist-role">Generative Installations</div>
+                </div>
+              </div>
+
+              <!-- Robert Fox -->
+              <div class="artist-card-custom" onclick="switchView('artist-detail')">
+                <div class="artist-avatar-wrap">
+                  <img src="https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=256&q=80" alt="Robert Fox" class="artist-avatar">
+                </div>
+                <div class="artist-info">
+                  <div class="artist-name">Robert Fox</div>
+                  <div class="artist-role">Digital Light & Shadow</div>
+                </div>
+              </div>
+
+              <!-- Cody Fisher -->
+              <div class="artist-card-custom" onclick="switchView('artist-detail')">
+                <div class="artist-avatar-wrap">
+                  <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=256&q=80" alt="Cody Fisher" class="artist-avatar">
+                </div>
+                <div class="artist-info">
+                  <div class="artist-name">Cody Fisher</div>
+                  <div class="artist-role">Interactive Media</div>
+                </div>
+              </div>
+
+              <!-- Marvin McKin -->
+              <div class="artist-card-custom" onclick="switchView('artist-detail')">
+                <div class="artist-avatar-wrap">
+                  <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=256&q=80" alt="Marvin McKin" class="artist-avatar">
+                </div>
+                <div class="artist-info">
+                  <div class="artist-name">Marvin McKin</div>
+                  <div class="artist-role">Mixed Reality</div>
+                </div>
+              </div>
+
+              <!-- Polina Shubkina -->
+              <div class="artist-card-custom" onclick="openPrototype('Stranded', 'By Polina Shubkina', 'https://images.unsplash.com/photo-1549213821-4708d624e1d1?auto=format&fit=crop&w=1200&q=80')">
+                <div class="artist-avatar-wrap">
+                  <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=256&q=80" alt="Polina Shubkina" class="artist-avatar">
+                </div>
+                <div class="artist-info">
+                  <div class="artist-name">Polina Shubkina</div>
+                  <div class="artist-role">Mixed Media & Spatial</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- VIEW 3: ARTIST DETAIL (ESTHER HOWARD) -->
+          <div class="view-container" id="view-artist-detail">
+            <div style="margin-bottom: 20px;">
+              <button class="back-nav-btn" onclick="switchView('artists')">
+                <i class="ph ph-caret-left"></i> Back to Artists
+              </button>
+            </div>
+
+            <!-- Profile Hero -->
+            <div class="detail-hero">
+              <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80" alt="Esther Howard" class="detail-cover">
+              
+              <div class="detail-info">
+                <h1 class="detail-name">Esther Howard</h1>
+                <div class="detail-tags">
+                  <span class="tag">@esther_howard</span>
+                  <span class="tag">Visual Artist</span>
+                </div>
+
+                <div class="creator-contact">
+                  <span>
+                    <i class="ph ph-map-pin"></i> Subang, West Java, Indonesia
+                  </span>
+                  <span>
+                    <i class="ph ph-envelope-simple"></i> johndoe@gmail.com
+                  </span>
+                </div>
+                
+                <p class="detail-bio">
+                  Lorem ipsum dolor sit amet, consec tetur adipiscing elit. Vivamus efficitur est ex, nec bibendum erat semper in. Ut hendrerit porta ex vitae elem entum. Vestibulum condimentum mauris non leo varius elementum. Donec sed ultricies tellus. Duis eget urna nec urna consectetur malesuada in id ipsum
+                </p>
+                
+                <div style="margin-top: 24px; display: flex; gap: 14px; align-items: center;">
+                  <button class="btn-primary" onclick="showToast('Message sent to Esther Howard')">
+                    <i class="ph ph-paper-plane-tilt"></i> Message
+                  </button>
+                  <a href="#" class="nav-item" style="background:var(--muted); border-radius: var(--radius-full);" aria-label="Facebook"><i class="ph ph-facebook-logo"></i></a>
+                  <a href="#" class="nav-item" style="background:var(--muted); border-radius: var(--radius-full);" aria-label="Instagram"><i class="ph ph-instagram-logo"></i></a>
+                  <a href="#" class="nav-item" style="background:var(--muted); border-radius: var(--radius-full);" aria-label="Website"><i class="ph ph-globe"></i></a>
+                </div>
+              </div>
+            </div>
+
+            <div class="section-title">
+              Virtual Exhibitions
+              <div class="galleries-count">4 collections</div>
+            </div>
+
+            <!-- 4 Featured Exhibitions -->
+            <div class="master-grid">
+              <div class="media-card" onclick="openPrototype('Dark Valley', 'By Esther Howard', 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=1200&q=80')">
+                <div class="media-img-wrap">
+                  <img src="https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=600&q=80" alt="Dark Valley">
+                </div>
+                <div class="media-info">
+                  <span class="media-title">Dark Valley</span>
+                  <span class="media-sub">Virtual Space &bull; Esther Howard</span>
+                </div>
+              </div>
+
+              <div class="media-card" onclick="openPrototype('Elysium Horizon', 'By Esther Howard', 'https://images.unsplash.com/photo-1577083288073-40892c0860a4?auto=format&fit=crop&w=1200&q=80')">
+                <div class="media-img-wrap">
+                  <img src="https://images.unsplash.com/photo-1577083288073-40892c0860a4?auto=format&fit=crop&w=600&q=80" alt="Elysium Horizon">
+                </div>
+                <div class="media-info">
+                  <span class="media-title">Elysium Horizon</span>
+                  <span class="media-sub">Virtual Space &bull; Esther Howard</span>
+                </div>
+              </div>
+
+              <div class="media-card" onclick="openPrototype('Quiet Monochrome', 'By Esther Howard', 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80')">
+                <div class="media-img-wrap">
+                  <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80" alt="Quiet Monochrome">
+                </div>
+                <div class="media-info">
+                  <span class="media-title">Quiet Monochrome</span>
+                  <span class="media-sub">Virtual Space &bull; Esther Howard</span>
+                </div>
+              </div>
+
+              <div class="media-card" onclick="openPrototype('Neon Solitude', 'By Esther Howard', 'https://images.unsplash.com/photo-1549213821-4708d624e1d1?auto=format&fit=crop&w=1200&q=80')">
+                <div class="media-img-wrap">
+                  <img src="https://images.unsplash.com/photo-1549213821-4708d624e1d1?auto=format&fit=crop&w=600&q=80" alt="Neon Solitude">
+                </div>
+                <div class="media-info">
+                  <span class="media-title">Neon Solitude</span>
+                  <span class="media-sub">Virtual Space &bull; Esther Howard</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- VIEW 4: HELP & GUIDES -->
+          <div class="view-container" id="view-help" style="height: 100%;">
+            <div class="help-split-layout">
+              <!-- Left Help Tabs -->
+              <div class="help-sidebar-menu">
+                <button class="help-menu-item active" data-tab="about" onclick="selectHelpTab('about')">
+                  <i class="ph ph-info"></i> About
+                </button>
+                <button class="help-menu-item" data-tab="dollhouse" onclick="selectHelpTab('dollhouse')">
+                  <i class="ph ph-cube"></i> Doll House
+                </button>
+                <button class="help-menu-item" data-tab="firstperson" onclick="selectHelpTab('firstperson')">
+                  <i class="ph ph-eye"></i> First Person
+                </button>
+                <button class="help-menu-item" data-tab="controller" onclick="selectHelpTab('controller')">
+                  <i class="ph ph-game-controller"></i> Controller
+                </button>
+                <button class="help-menu-item" data-tab="navigation" onclick="selectHelpTab('navigation')">
+                  <i class="ph ph-compass"></i> Navigation
+                </button>
+                <button class="help-menu-item" data-tab="terms" onclick="selectHelpTab('terms')">
+                  <i class="ph ph-file-text"></i> Term of Service
+                </button>
+                <button class="help-menu-item" data-tab="privacy" onclick="selectHelpTab('privacy')">
+                  <i class="ph ph-shield-check"></i> Privacy Policy
+                </button>
+              </div>
+
+              <!-- Right Dynamic Help Content -->
+              <div class="help-content-area" id="help-content-area">
+                <!-- Dynamically populated by selectHelpTab -->
+              </div>
+            </div>
+          </div>
+
+          <!-- VIEW 5: SETTINGS (SAME VISION PRO SPLIT LAYOUT AS HELP) -->
+          <div class="view-container" id="view-settings" style="height: 100%;">
+            <div class="help-split-layout">
+              <!-- Left Setting Tabs Menu -->
+              <div class="help-sidebar-menu">
+                <button class="help-menu-item" data-setting-tab="language" onclick="selectSettingTab('language')">
+                  <i class="ph ph-translate"></i> Language
+                </button>
+                <button class="help-menu-item active" data-setting-tab="navigation" onclick="selectSettingTab('navigation')">
+                  <i class="ph ph-game-controller"></i> Navigation
+                </button>
+              </div>
+
+              <!-- Right Setting Content Area -->
+              <div class="help-content-area" id="setting-content-area">
+                
+                <!-- NAVIGATION SETTINGS TAB -->
+                <div id="setting-tab-navigation" style="display: flex; flex-direction: column; gap: 20px; width: 100%;">
+                  
+                  <!-- Top VR Controller Diagram Card -->
+                  <div class="help-info-card" style="padding: 24px 20px; display: flex; align-items: center; justify-content: center; background: rgba(22, 22, 28, 0.7);">
+                    <img id="setting-controller-img" src="assets/icons/navigation-full-motion.svg" alt="VR Controllers Navigation Diagram" style="max-height: 250px; width: 100%; object-fit: contain;">
+                  </div>
+
+                  <!-- Bottom Controls & Description Card -->
+                  <div class="help-info-card" style="padding: 24px 28px; background: rgba(22, 22, 28, 0.7); display: flex; flex-direction: column; align-items: center; text-align: center;">
+                    
+                    <!-- Motion Mode Pill Toggle -->
+                    <div style="display: inline-flex; background: rgba(255, 255, 255, 0.08); padding: 4px; border-radius: var(--radius-md); gap: 4px; border: 1px solid var(--border-subtle);">
+                      <button class="setting-motion-toggle-btn active" id="setting-btn-fullmotion" onclick="setSettingMotionMode('full')">Full Motion</button>
+                      <button class="setting-motion-toggle-btn" id="setting-btn-comfortmotion" onclick="setSettingMotionMode('comfort')">Comfort Motion</button>
+                    </div>
+
+                    <!-- Radio Rotation Options -->
+                    <div class="setting-radios-row" id="setting-radios-row" style="display: flex; gap: 28px; align-items: center; justify-content: center; margin: 18px 0 16px 0;">
+                      <label class="setting-radio-label">
+                        <input type="radio" name="setting-rot-choice" value="snap" checked onchange="setSettingRotationMode('snap')">
+                        <span>Snap Rotation</span>
+                      </label>
+                      <label class="setting-radio-label">
+                        <input type="radio" name="setting-rot-choice" value="smooth" onchange="setSettingRotationMode('smooth')">
+                        <span>Smooth Rotation</span>
+                      </label>
+                    </div>
+
+                    <!-- Description Text matching Image 1 -->
+                    <p class="setting-desc-text" id="setting-motion-desc">
+                      Full motion snap rotation is a navigation mode where rotation occurs in 30-degree increments, providing a segmented turning experience. In this mode, users have complete control over movement and rotation within the gallery room. The movement is designed to replicate real-world walking simulations, enhancing immersion. Additionally, users can interact with artworks by approaching or being approached by them. The control bar can be toggled for a clear view of the gallery room, and the dashboard offers access to all menu options in Villume.
+                    </p>
+                  </div>
+                </div>
+
+                <!-- LANGUAGE SETTINGS TAB -->
+                <div id="setting-tab-language" style="display: none; flex-direction: column; gap: 16px; width: 100%;">
+                  <div class="help-info-card" style="padding: 24px 28px; background: rgba(22, 22, 28, 0.7); display: flex; flex-direction: column; align-items: stretch; text-align: left;">
+                    <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">Interface Language</div>
+                    <p style="font-size: 13.5px; color: var(--muted-foreground); margin-bottom: 20px;">
+                      Select your preferred language for menus, artwork details, and navigation guides.
+                    </p>
+
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                      <label class="setting-radio-label" style="background: rgba(255,255,255,0.04); padding: 12px 18px; border-radius: var(--radius-md);">
+                        <input type="radio" name="setting-lang" value="en" checked onchange="showToast('Language: English')">
+                        <span>English (United States) <span style="font-size: 11px; color: var(--muted-foreground); margin-left: 6px;">(Default)</span></span>
+                      </label>
+                      <label class="setting-radio-label" style="background: rgba(255,255,255,0.04); padding: 12px 18px; border-radius: var(--radius-md);">
+                        <input type="radio" name="setting-lang" value="id" onchange="showToast('Bahasa: Bahasa Indonesia')">
+                        <span>Bahasa Indonesia</span>
+                      </label>
+                      <label class="setting-radio-label" style="background: rgba(255,255,255,0.04); padding: 12px 18px; border-radius: var(--radius-md);">
+                        <input type="radio" name="setting-lang" value="ja" onchange="showToast('言語: 日本語')">
+                        <span>日本語 (Japanese)</span>
+                      </label>
+                      <label class="setting-radio-label" style="background: rgba(255,255,255,0.04); padding: 12px 18px; border-radius: var(--radius-md);">
+                        <input type="radio" name="setting-lang" value="de" onchange="showToast('Sprache: Deutsch')">
+                        <span>Deutsch (German)</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Vision Pro Handle Bar -->
+        <div class="window-handle-bar"></div>
+      </main>
+
+    </div>
+  </div>
+
+  <!-- Spatial Bottom Quick Controls Dock (Apple Vision Pro) -->
+  <div class="spatial-bottom-dock fade-up" id="spatial-bottom-hud">
+    <button class="bottom-dock-btn" id="hud-cube-btn" title="Show Dashboard & Menu" onclick="toggleDashboardFromHud()"><i class="ph ph-cube"></i></button>
+    <button class="bottom-dock-btn" title="Help & Navigation Guides" onclick="showDashboardAndSwitch('help')"><i class="ph ph-question"></i></button>
+    <button class="bottom-dock-btn" title="Previous Gallery" onclick="slideHighlightCarousel(-1)"><i class="ph ph-skip-back"></i></button>
+    <button class="bottom-dock-btn active" title="Immersive Walkthrough" onclick="openPrototype('Dark Valleys', 'By Georg Katstaller', 'assets/images/dark-valley-2.png')"><i class="ph ph-play"></i></button>
+    <button class="bottom-dock-btn" title="Next Gallery" onclick="slideHighlightCarousel(1)"><i class="ph ph-skip-forward"></i></button>
+    <button class="bottom-dock-btn" title="Exhibition Details" onclick="togglePrototypeInfo()"><i class="ph ph-info"></i></button>
+    <button class="bottom-dock-btn" title="Artists & Creators" onclick="showDashboardAndSwitch('artists')"><i class="ph ph-user"></i></button>
+  </div>
+
+  <!-- STANDALONE CONTROLLER MODAL -->
+  <div class="nav-modal-backdrop" id="controller-modal">
+    <div class="nav-modal-card">
+      <div class="nav-modal-header">
+        <div class="nav-modal-title">VR Navigation Controllers Guide</div>
+        <button class="nav-modal-close" onclick="closeControllerModal()"><i class="ph ph-x"></i></button>
+      </div>
+      <div class="nav-modal-body">
+        <img src="assets/images/navigation-controllers.png" alt="Navigation Controllers Guide">
+      </div>
+    </div>
+  </div>
+
+  <!-- STANDALONE SETTINGS MODAL (SPLIT NAVIGATION & SETTINGS) -->
+  <div class="nav-modal-backdrop" id="settings-modal" onclick="if(event.target === this) closeSettingsModal()">
+    <div class="nav-modal-card" style="width: 780px; max-width: 92vw;">
+      <div class="nav-modal-header" style="background: #1c1c22; padding: 16px 24px;">
+        <div class="nav-modal-title" style="font-size: 18px; font-weight: 600;">Setting</div>
+        <button class="nav-modal-close" onclick="closeSettingsModal()"><i class="ph ph-x"></i></button>
+      </div>
+      
+      <div class="setting-split-layout">
+        <!-- Left Sidebar Navigation -->
+        <nav class="setting-sidebar-nav">
+          <button class="setting-nav-btn" data-panel="language" onclick="switchSettingTab('language')">
+            <i class="ph ph-translate"></i> Language
+          </button>
+          <button class="setting-nav-btn active" data-panel="navigation" onclick="switchSettingTab('navigation')">
+            <i class="ph ph-game-controller"></i> Navigation
+          </button>
+        </nav>
+
+        <!-- Right Content Panel -->
+        <div class="setting-content-panel">
+          
+          <!-- NAVIGATION SETTINGS TAB -->
+          <div id="setting-panel-navigation" style="display: flex; flex-direction: column; gap: 14px; width: 100%;">
+            <!-- Controller Callout Diagram Card -->
+            <div class="setting-diagram-card">
+              <img id="setting-controller-img" src="assets/icons/navigation-full-motion.svg" alt="VR Controller Navigation Diagram">
+            </div>
+
+            <!-- Locomotion & Rotation Controls Card -->
+            <div class="setting-controls-card">
+              <div class="setting-motion-toggle-wrap">
+                <button class="setting-motion-toggle-btn active" id="setting-btn-fullmotion" onclick="setSettingMotionMode('full')">Full Motion</button>
+                <button class="setting-motion-toggle-btn" id="setting-btn-comfortmotion" onclick="setSettingMotionMode('comfort')">Comfort Motion</button>
+              </div>
+
+              <!-- Radio Rotation Selection -->
+              <div class="setting-radios-row" id="setting-radios-row">
+                <label class="setting-radio-label">
+                  <input type="radio" name="rotation-mode" value="snap" checked onchange="setSettingRotationMode('snap')">
+                  Snap Rotation
+                </label>
+                <label class="setting-radio-label">
+                  <input type="radio" name="rotation-mode" value="smooth" onchange="setSettingRotationMode('smooth')">
+                  Smooth Rotation
+                </label>
+              </div>
+
+              <!-- Informative Description Text -->
+              <p class="setting-desc-text" id="setting-motion-desc">
+                Full motion snap rotation is a navigation mode where rotation occurs in 30-degree increments, providing a segmented turning experience. In this mode, users have complete control over movement and rotation within the gallery room. The movement is designed to replicate real-world walking simulations, enhancing immersion. Additionally, users can interact with artworks by approaching or being approached by them. The control bar can be toggled for a clear view of the gallery room, and the dashboard offers access to all menu options in Villume.
+              </p>
+            </div>
+          </div>
+
+          <!-- LANGUAGE SETTINGS TAB -->
+          <div id="setting-panel-language" style="display: none; flex-direction: column; gap: 18px; width: 100%;">
+            <div class="setting-controls-card" style="align-items: stretch; text-align: left;">
+              <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 14px;">Display & Interface Language</h3>
+              <p style="font-size: 13.5px; color: var(--muted-foreground); margin-bottom: 20px;">
+                Choose your preferred language for the Villume VR interface, artwork descriptions, and guides.
+              </p>
+              
+              <div style="display: flex; flex-direction: column; gap: 12px;">
+                <label class="setting-radio-label" style="background: rgba(255,255,255,0.04); padding: 12px 16px; border-radius: 8px;">
+                  <input type="radio" name="lang-choice" value="en" checked onchange="showToast('Language: English')">
+                  <span>English (United States) <span style="font-size: 12px; color: var(--muted-foreground); margin-left: 8px;">Default</span></span>
+                </label>
+                <label class="setting-radio-label" style="background: rgba(255,255,255,0.04); padding: 12px 16px; border-radius: 8px;">
+                  <input type="radio" name="lang-choice" value="id" onchange="showToast('Bahasa: Bahasa Indonesia')">
+                  <span>Bahasa Indonesia</span>
+                </label>
+                <label class="setting-radio-label" style="background: rgba(255,255,255,0.04); padding: 12px 16px; border-radius: 8px;">
+                  <input type="radio" name="lang-choice" value="ja" onchange="showToast('言語: 日本語')">
+                  <span>日本語 (Japanese)</span>
+                </label>
+                <label class="setting-radio-label" style="background: rgba(255,255,255,0.04); padding: 12px 16px; border-radius: 8px;">
+                  <input type="radio" name="lang-choice" value="de" onchange="showToast('Sprache: Deutsch')">
+                  <span>Deutsch (German)</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IMMERSIVE PROTOTYPE / ARTWORK VIEW OVERLAY -->
+  <div class="prototype-overlay" id="prototype-overlay">
+    <!-- Background Video Preview -->
+    <video class="prototype-video-bg" id="proto-video" autoplay loop muted playsinline>
+      <source src="assets/videos/vr-walkthrough.mp4" type="video/mp4">
+    </video>
+
+    <!-- Top Canvas HUD -->
+    <div class="prototype-top-hud">
+      <div style="font-size: 20px; font-weight: 700; letter-spacing: -0.4px;" id="proto-hud-title">Dark Valley</div>
+      <div style="font-size: 13px; color: var(--muted-foreground);" id="proto-hud-sub">By Georg Katstaller &bull; Spatial Walkthrough</div>
+    </div>
+
+    <!-- Info Details Drawer -->
+    <div class="prototype-info-drawer" id="prototype-info-drawer">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <h2 style="font-size: 20px; font-weight: 700;">Exhibition Details</h2>
+        <button class="nav-item" style="width: 32px; height: 32px;" onclick="togglePrototypeInfo()"><i class="ph ph-x"></i></button>
+      </div>
+
+      <!-- Curator Card -->
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; background: var(--muted); border-radius: var(--radius-lg); margin-bottom: 24px;">
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=128&q=80" alt="Curator" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover;">
+          <div>
+            <div style="font-size: 11px; text-transform: uppercase; color: var(--muted-foreground); font-weight: 600;">Curator</div>
+            <div style="font-size: 15px; font-weight: 600;">Esther Howard</div>
+          </div>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button class="nav-item" style="width: 36px; height: 36px; font-size: 16px;" onclick="showToast('Contacting curator...')"><i class="ph ph-chat-circle"></i></button>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 28px; line-height: 1.7; font-size: 14px; color: var(--foreground); opacity: 0.85;">
+        <p>Step inside this fully immersive VR exhibition environment. Navigate freely through spatial architectural rooms, explore handcrafted physical and digital installations, and interact with artworks in real-time stereoscopic depth.</p>
+      </div>
+
+      <!-- Share Section -->
+      <div style="margin-bottom: 28px;">
+        <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">Share Gallery</h4>
+        <div style="display: flex; gap: 10px;">
+          <input type="text" id="share-url-input" value="https://gallery.villume.com/exhibition/dark-valley" readonly style="flex:1; background: var(--muted); border: 1px solid var(--border); border-radius: var(--radius-full); padding: 0 16px; color: var(--foreground); outline: none; font-size: 13px;">
+          <button class="btn-primary" onclick="copyShareLink()"><i class="ph ph-copy"></i> Copy</button>
+        </div>
+      </div>
+
+      <!-- List of Artworks -->
+      <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 14px;">Included Artworks</h4>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+        <div class="media-card" style="padding: 10px;">
+          <div class="media-img-wrap" style="aspect-ratio: 4/3;">
+            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=400&q=80" alt="Dark Valleys">
+          </div>
+          <div class="media-info" style="margin-top: 8px;">
+            <div style="font-size: 11px; color: var(--muted-foreground);">GEORG KATSTALLER</div>
+            <div style="font-size: 13px; font-weight: 600;">Dark Valleys</div>
+          </div>
+        </div>
+
+        <div class="media-card" style="padding: 10px;">
+          <div class="media-img-wrap" style="aspect-ratio: 4/3;">
+            <img src="https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=400&q=80" alt="From Stone to Silicone">
+          </div>
+          <div class="media-info" style="margin-top: 8px;">
+            <div style="font-size: 11px; color: var(--muted-foreground);">VILLUME</div>
+            <div style="font-size: 13px; font-weight: 600;">From Stone to Silicone</div>
+          </div>
+        </div>
+
+        <div class="media-card" style="padding: 10px;">
+          <div class="media-img-wrap" style="aspect-ratio: 4/3;">
+            <img src="https://images.unsplash.com/photo-1549213821-4708d624e1d1?auto=format&fit=crop&w=400&q=80" alt="Stranded">
+          </div>
+          <div class="media-info" style="margin-top: 8px;">
+            <div style="font-size: 11px; color: var(--muted-foreground);">POLINA SHUBKINA</div>
+            <div style="font-size: 13px; font-weight: 600;">Stranded</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VR Bottom Control Dock -->
+    <nav class="dock-horizontal fade-up" id="prototype-bottom-dock">
+      <button class="nav-item" onclick="closePrototype()" title="Exit to Window"><i class="ph ph-x"></i></button>
+      <div style="width: 1px; height: 20px; background: var(--border-subtle); margin: 0 4px;"></div>
+      <button class="nav-item" onclick="setLocomotion('walk')" id="loco-walk" title="Walk Mode"><i class="ph ph-sneaker"></i></button>
+      <button class="nav-item active" onclick="setLocomotion('fly')" id="loco-fly" title="Fly Mode"><i class="ph ph-paper-plane-tilt"></i></button>
+      <button class="nav-item" onclick="setLocomotion('teleport')" id="loco-teleport" title="Teleport Mode"><i class="ph ph-target"></i></button>
+      <div style="width: 1px; height: 20px; background: var(--border-subtle); margin: 0 4px;"></div>
+      <button class="nav-item" onclick="togglePrototypeInfo()" title="Exhibition Info"><i class="ph ph-info"></i></button>
+      <button class="nav-item" onclick="openControllerModal()" title="Controller Guide"><i class="ph ph-game-controller"></i></button>
+    </nav>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="share-toast" id="toast-notify">Notification</div>
+
+  <script>
+    // Help View Tab Data Dictionary
+    const helpTabsData = {
+        "about": {
+            "img": "assets/images/about.png",
+            "alt": "First Person View",
+            "style": "max-height: 200px; width: auto; object-fit: contain;",
+            "bg": "#181820",
+            "text": "First person is a feature that changes the perspective of the gallery camera display into a first-person point of view. In other words, this feature allows you to view the gallery as if you are inside it, seeing directly through your own eyes.",
+            "title": "About Villume VR"
+        },
+        "dollhouse": {
+            "img": "assets/images/dollhouse-view.png",
+            "alt": "Doll House View",
+            "style": "max-height: 200px; max-width: 90%; object-fit: contain;",
+            "bg": "#181820",
+            "text": "Doll house is a feature that changes the perspective of the gallery camera display into a top-down view or \"bird's eye view\". In other words, this feature allows you to see the entire room view.",
+            "title": "Doll House View"
+        },
+        "firstperson": {
+            "img": "assets/images/first-person-guide.png",
+            "alt": "First Person View",
+            "style": "max-height: 200px; width: auto; object-fit: contain;",
+            "bg": "#181820",
+            "text": "First person is a feature that changes the perspective of the gallery camera display into a first-person point of view. In other words, this feature allows you to view the gallery as if you are inside it, seeing directly through your own eyes.",
+            "title": "First Person View"
+        },
+        "controller": {
+            "cards": [
+                {
+                    "title": "Full Motion Snap Rotation",
+                    "img": "assets/icons/navigation-full-motion.svg",
+                    "alt": "Full Motion Snap Rotation",
+                    "style": "max-height: 180px; width: 92%; object-fit: contain;",
+                    "bg": "#181820",
+                    "text": "Full motion snap rotation is a navigation mode where rotation occurs in 30-degree increments, providing a segmented turning experience. In this mode, users have complete control over movement and rotation within the gallery room. The movement is designed to replicate real-world walking simulations, enhancing immersion. Additionally, users can interact with artworks by approaching or being approached by them. The control bar can be toggled for a clear view of the gallery room, and the dashboard offers access to all menu options in Villume."
+                },
+                {
+                    "title": "Smooth Motion",
+                    "img": "assets/icons/navigation-comfort-motion.svg",
+                    "alt": "Smooth Motion",
+                    "style": "max-height: 180px; width: 92%; object-fit: contain;",
+                    "bg": "#181820",
+                    "text": "Smooth motion is a continuous locomotion mode where movement and rotation occur smoothly without snap intervals, designed for experienced VR users seeking seamless continuous movement throughout the gallery space."
+                }
+            ]
+        },
+        "navigation": {
+            "cards": [
+                {
+                    "title": "Navigation Controls",
+                    "img": "assets/images/navigation-controllers.png",
+                    "alt": "Navigation Controls",
+                    "style": "width: 100%; height: auto; max-height: 260px; object-fit: contain;",
+                    "bg": "#181820",
+                    "text": "Explore the gallery space effortlessly using dual VR controllers. Use thumbsticks for smooth motion or snap rotation, grab triggers to adjust your view position, and buttons to toggle dashboard and exhibition menu bars.",
+                    "showModalBtn": true
+                }
+            ]
+        },
+        "terms": {
+            "cards": [
+                {
+                    "isDoc": true,
+                    "title": "Terms of Use",
+                    "date": "Effective Date: January 2022",
+                    "paragraphs": [
+                        "This Terms of Use (the \u201cTOU\u201d) is entered into between you and Galleria Media Inc. (\u201cCompany\u201d) and applies to any product, website or service provided by Company, including but not limited to an online art gallery platform currently titled \u201cVillume\u201d (\u201cVillume\u201d), the website villume.com and subdomains (the \u201cWebsite\u201d) and any other product or service to which Company applies the TOU (collectively, the \u201cService\u201d).",
+                        "<div class=\"help-doc-alert\">BY CLICKING \u201cI AGREE\u201d OR SIMILAR CONFIRMATION OR BY USING THE SERVICE YOU ARE AGREEING TO BE BOUND BY THE TOU.</div>",
+                        "<div class=\"help-doc-section-title\">1. Description of the Service; Access</div>",
+                        "<strong>1.1 Scope of Service.</strong> The Service allows you to create and host online exhibitions (\u201cExhibitions\u201d), which may be accessed and viewed by attendees (each an \u201cAttendee\u201d). Company hereby grants you a: (a) non-transferrable, limited subscription to access and use free portions of the Website and paid portions of the Service pursuant to a paid subscription, in each case subject to the TOU (altogether, the \u201cSubscription\u201d); and (b) non-sublicensable, non-transferrable, revocable, limited license to publicly display parts of the Service on online video streaming websites, such as YouTube and Twitch, and on other social media platforms, such as Twitter or Instagram. A paid Subscription may allow you to create, store and make publicly available the number of Exhibitions and receive additional features as permitted by the terms of your Subscription (collectively, the \u201cFeatures\u201d).",
+                        "<strong>1.2 Age of Access.</strong> The Service is provided for people of all ages. If you are under the age of consent in your jurisdiction, you shall: (a) if required by the laws of your jurisdiction, obtain and provide to Company the consent of your parent or guardian to use the Service; and (b) if requested by Company, provide additional verifiable parental consent.",
+                        "<strong>1.3 Accounts and Login Information.</strong> Access to the Service may require you to register an account with Company (\u201cAccount\u201d). In order to access an Account, you shall create a user ID and password and provide additional information requested by Company (collectively, \u201cLogin Information\u201d). You shall manage and ensure the security, confidentiality and authorized use of Login Information. You are prohibited from sharing Login Information. Company strongly recommends that you keep Login Information confidential. You agree to be bound by any use of the Account, including charges and purchases, whether or not authorized and shall notify Company promptly of unauthorized access or use of the Account.",
+                        "<strong>1.4 Early Release.</strong> The Service, including the creation of and access to Exhibitions, may be provided to you in a beta or other in-development, trial or demonstrator version (\u201cBeta Version\u201d). If you use or access a Beta Version of the Service, you acknowledge and agree that the Service may not work as intended and Exhibitions, editing capabilities, or other features (collectively, \u201cBeta Features\u201d) may be very different from future releases of the Service. Bugs, incomplete Beta Features, or faults may be present in a Beta Version, and you use any Beta Version at your own risk. Company does not guarantee that the Service will be completed and may significantly alter or remove Beta Features at any time. Given the developmental nature of Beta Version software and services in general, you agree that it is your sole responsibility to back-up data and take other appropriate measures to protect data you use in connection with the Service.",
+                        "<strong>1.5 Privacy Policy and Privacy Law Compliance.</strong> Use of the Service is governed by a Privacy Policy detailing how Company collects, uses and discloses personal and anonymous data about you and is available at [Privacy policy link]. You must agree to the Privacy Policy in order to use the Service. By agreeing to the TOU and/or using the Service, you represent and warrant that your use of the Service complies with applicable privacy laws and are permitted to share the personal data that you choose to share with Company, including but not limited to any information includes the personal data of Attendees and your employees, contractors, agents. If at any time you disagree with the Privacy Policy, you shall immediately stop use of the Service and contact Company at info@villume.com."
+                    ]
+                },
+                {
+                    "isDoc": true,
+                    "title": "Privacy Policy",
+                    "date": "Effective Date: January 2022",
+                    "paragraphs": [
+                        "This Privacy Policy applies to Galleria Media Inc. (\u201cGalleria\u201d, \u201cwe\u201d, \u201cour\u201d or \u201cus\u201d) services, including but not limited to our website villume.com (the \u201cWebsite\u201d), our online art galleries currently titled \u201cVillume\u201d (\u201cVillume\u201d), our social media accounts and online forums, and any other product or service that we choose to apply this Privacy Policy to (collectively, the \u201cService\u201d), and details how we collect, use, and disclose data about our users, including you.",
+                        "<div class=\"help-doc-alert\">BY CLICKING \u201cI AGREE\u201d OR SIMILAR CONFIRMATION OR BY USING THE SERVICE YOU ARE AGREEING TO THE TERMS OF THIS PRIVACY POLICY AS APPLICABLE IN YOUR JURISDICTION.</div>",
+                        "<div class=\"help-doc-section-title\">1. How we obtain your data</div>",
+                        "The Service collects and processes personal data, which is information about you or that identifies you, as well as anonymous data, which does not identify you.",
+                        "We obtain your personal data directly from you or when you use the Service. In many circumstances you may be required to submit personal data in order to access the Service. Your provision of personal data to Galleria is governed by any terms of use, end-user license agreement or similar agreement that we may apply to the Service, which you must agree to in order to use the Service, and this Privacy Policy. If you have any questions or concerns about the disclosure of your personal data please contact us at your convenience using the contact information found below.",
+                        "Subject to legal, contractual and technical requirements, you may choose not to provide Galleria with certain data or request the deletion of certain data, which may impact the Service features available to you or essential operations of the Service",
+                        "<div class=\"help-doc-section-title\">2. Personal data we Collect</div>",
+                        "The following is a description of the personal data that we may collect, use and process in connection with the Service:\n              <ul style=\"margin: 8px 0 8px 24px;\">\n                <li>Your full name for the client account;</li>\n                <li>Your email address, should you decide to request communication from us;</li>\n                <li>Any other personal information that you choose to share with us through our social media accounts and online forums;</li>\n              </ul>\n              We also collect anonymous data that does not identify you, including but not limited to responses to anonymous feedback requests, metrics and other types of statistical data, which could be derived from use of the Service and analytical data concerning the Service.",
+                        "<div class=\"help-doc-section-title\">3. Processing of Your Personal and ANONYMOUS data</div>",
+                        "We process your personal and anonymous data primarily for our legitimate business purposes, such as providing the Service to you, to understand your needs and the needs of our users and to improve the quality of the Service and analyze the data we collect. Specifically, these uses include but are not limited to:\n              <ul style=\"margin: 8px 0 8px 24px;\">\n                <li>providing the Service;</li>\n                <li>interacting with you through our social media accounts or profiles and providing customer support and feedback;</li>\n                <li>authenticating users;</li>\n                <li>maintaining and analyzing functionality of Villume and the Service, backing up data, testing and developing new aspects of Villume, researching new features of the Service, updating Villume and the Service and generating reports and data models that we use to improve the Service;</li>\n                <li>supporting the security and integrity of the Service and its users including but not limited to detecting and protecting Villume and other third-parties against error, fraud, theft and other illegal activity or for contractual, legal, regulatory or audit obligations;</li>\n                <li>investigating improper or suspicious activity; and</li>\n                <li>contacting you for various reasons including, but not limited to, user feedback requests or marketing purposes and events, if you previously consented to such contact.</li>\n              </ul>\n              We may disclose your personal and anonymous data to our parent companies, affiliates, subsidiaries, employees and contractors for the same purposes described above. We may also disclose your personal and anonymous data to third-parties, who may be located in a foreign jurisdiction and subject to foreign laws. The situations where we disclose your personal and anonymous information to third-parties include, but are not limited to:\n              <ul style=\"margin: 8px 0 8px 24px;\">\n                <li>processing your information as described above as well as providing and enhancing the Service features;</li>\n                <li>providing customer support and feedback, analyzing the Service functionality and technical issues, tracking use of the Service and generating reports and data models that we use to improve the Service;</li>\n                <li>providing customized, tailored and personalized advertisements to users of the Service; and</li>\n                <li>responding to a request from law enforcement or a government that has asserted its lawful authority to obtain the data or where Galleria has reasonable grounds to believe the data could be useful in the investigation of unlawful activity, complying with a subpoena or warrant or an order made by a court, person or body with jurisdiction to compel the production of data, complying with court rules regarding the production of records and data, defending our rights and the rights of others or providing information to our legal counsel.</li>\n              </ul>",
+                        "<div class=\"help-doc-section-title\">4. THIRD-PARTY SERVICES</div>",
+                        "In accordance with this Policy, we may disclose other personal information to third-parties or service providers in other provinces or foreign countries, where it may be processed, stored, or transferred to a foreign country, with different privacy laws. By submitting your personal information to Galleria, you consent to this transfer, storage, and processing. We strongly recommend that you read each third-party privacy policy carefully before using the Service. Galleria may provide data to third-parties, including Stripe. Please contact us directly using the information found below if you would like to learn more about third-party data practices.",
+                        "<div class=\"help-doc-section-title\">5. Cookies and DIGITAL TRACKING Technologies</div>",
+                        "The Service may use tracking technologies, such as cookies web beacons, JavaScript tags and clear GIFs to collect data about you, such as your IP address and device information. Based on the data collected from the above listed tracking technologies, third-parties may be able to resolve your identity across multiple devices, for example, by matching your IP address, in order to target you based on your behavior. This data is collected, used and disclosed in accordance with the terms of this Privacy Policy and the applicable third-party privacy policies.",
+                        "<div class=\"help-doc-section-title\">6. Obtaining, rectifying and controlling your personal data</div>",
+                        "You may contact Galleria to obtain a copy of any personal data we collected about you, the production of which may be subject to a fee as permitted by applicable law. In addition, you may contact Galleria to correct inaccurate personal data or to complete incomplete personal data.You may be able to opt-out of some or all of the ways in which your personal data is processed, or request the deletion of certain personal data, except where the personal data is necessary or vital:\n              <ul style=\"margin: 8px 0 8px 24px;\">\n                <li>for the performance of contractual obligations, such as the terms of use;</li>\n                <li>to comply with our legal obligations;</li>\n                <li>to protect your interests or those of another person; or</li>\n                <li>for our legitimate interests or the legitimate interests of a third-party, and may do so by removing personal data, if the Service permits such removal, by ceasing your access to Galleria and contacting us using the contact information found below.</li>\n              </ul>",
+                        "<div class=\"help-doc-section-title\">7. Data Storage, Retention and Transfers</div>",
+                        "While Galleria is a Canadian company, the data you provide through the Service may be stored and processed by third parties in countries around the world. You authorize Galleria and third parties acting on our behalf to process your data in any country of their choosing, which may cause your data, including personal and anonymous data, to be subject to privacy protections and legal rights that may not be equivalent to those in your country.",
+                        "Galleria complies with international personal data transfer laws in applicable jurisdictions. For EU residents, Counselling complies with Articles 44\u201349 of the European Union\u2019s General Data Protection Regulation (the \u201cGDPR\u201d). Galleria also follows UK laws equivalent to what is required by the GDPR for all data collected from UK data subjects. Currently, all transfers of personal data to Canada from residents of the EU are covered by an adequacy decision as described in Article 45 of the GDPR.",
+                        "Your personal data is retained until you request its deletion or until Galleria no longer requires such data for the purpose for which it was collected or until required to be deleted by laws applicable in your jurisdiction. Please email us at info@villume.com to delete any personal data we hold.",
+                        "<div class=\"help-doc-section-title\">8. Children</div>",
+                        "Galleria complies with the United States Children\u2019s Online Privacy Protection Act and all other applicable privacy laws and regulations concerning children and the Internet including laws applicable to residents of the EEA. The Service and Villume are not directed to children under the age of 18 and although it may be possible that children below the age of 18 access certain features of the Service, we do not knowingly collect personal data from children under the age of 18 without first obtaining the appropriate parental consent required by law. If we learn that we inadvertently collected personal data from a child under the age of 18, in a jurisdiction where consent of a parent or guardian is required to be collected prior to the collection of such personal data, without first obtaining such appropriate parental consent, we will delete that data as quickly as possible. If you are a parent or guardian of a child under 18, who you believe provided Galleria with personal data without your consent, please contact us at info@villume.com.",
+                        "<div class=\"help-doc-section-title\">9. DO NOT TRACK DISCLOSURE</div>",
+                        "Do Not Track (\u201cDNT\u201d) is a web or device setting that allows users to request that receivers of personal data stop their tracking activities. When you choose to turn on the DNT setting in your browser or device or use alternative consumer choice mechanisms, your browser or device sends a special signal to websites, analytics companies, advertising networks, plug in providers and other web services you encounter to stop tracking your activity. Currently, there are no DNT technology standards and it is possible that there may never be any DNT technology standards. As a result, we do not respond to DNT requests.",
+                        "<div class=\"help-doc-section-title\">10. CALIFORNIA \u201cSHINE THE LIGHT\u201d RIGHT</div>",
+                        "If you are a California resident, California Civil Code \u00a7 1798.83 grants you the right to request our disclosure of the categories of personal information we provided to third parties, and the names and addresses of these third parties, for direct marketing purposes during the preceding calendar year. If you are a California resident and would like to make this request, please contact us using the contact information set forth below.<br>Please note that you may only make this request once per year.",
+                        "<div class=\"help-doc-section-title\">11. YOUR CALIFORNIA PRIVACY RIGHTS</div>",
+                        "If you are a California resident, California Civil Code Section 1798.120 permits you to opt-out of the sale of your personal information to third parties. Currently, Galleria does not sell your personal information to third parties and as such no opt-out of the sale of such personal information is necessary. Although Galleria does not sell your personal information, Galleria does provide a general opt-out right to all of our clients and users as described in our Privacy Policy. Furthermore, as Galleria already complies with Canadian and EU privacy laws, the rights required to be provided by law to Californian residents are provide to all our clients and users. If you have any other questions about our privacy practices, please email us at info@villume.com.",
+                        "<div class=\"help-doc-section-title\">12. European users and rights of european Economic Area residents</div>",
+                        "Galleria has a legitimate interest, as described in Article 6(1)(f) of the GDPR, in collecting your personal data as described in section 2 of this Privacy Policy for the purposes described in detail in section 3 of this Privacy Policy. In addition, when you provide consent to contact you using your email address or when providing us your contact information by linking a third-party Account to our Service, Galleria may contact and communicate with you using this information, pursuant to Article 6(1)(a) of the GDPR.",
+                        "If you are a resident of the European Union, you have certain rights in regard to your personal data. These rights include:\n              <ul style=\"margin: 8px 0 8px 24px;\">\n                <li><strong>A Right of Access.</strong> You have the right to access your personal data that we hold about you free of charge in most circumstances;</li>\n                <li><strong>A Right to Rectification.</strong> If your personal data is inaccurate or incomplete, you can change the information you provided by changing the information yourself on your Account or by contacting Galleria using the email listed below;</li>\n                <li><strong>A Right to Erasure.</strong> You have the right to obtain deletion of personal data concerning you in many cases. Often you can just delete your information by yourself through your Account, but you can also request the deletion by using the contact information found below. Please be careful as the deletion of your data in this manner is permanent and may never be restored;</li>\n                <li><strong>A Right to Object.</strong> If the processing of your personal data is based on legitimate interests according to Article 6(1)(f) of the GDPR, you have the right to object to this processing in most cases. If you object, we will no longer process your personal data unless there are compelling and prevailing legitimate grounds for the processing as described in Article 21 of the GDPR; in particular if the personal data is necessary for the establishment, exercise or defense of legal claims or in the case where the personal data is required for the provision of certain features of the Service, and you still wish to use such features of the Service;</li>\n                <li><strong>A Right to file a Complaint.</strong> You have the right to file a complaint with the appropriate supervisory authority in your jurisdiction;</li>\n                <li><strong>A Right to Restriction of Processing of your Personal Data.</strong> You have the right to obtain restrictions on the processing of your personal data as described in Article 18 of the GDPR;</li>\n                <li><strong>A Right to Personal Data Portability.</strong> You have the right to receive your Personal Data in a structured, commonly used and machine-readable format and have the right to transmit such data to another controller under the conditions described in Article 20 of the GDPR. Although the personal data collected by Galleria is not particularly useful to other companies as the data collected largely relates to your usage of the Service, Galleria will comply will all requests for the portability of your personal data;</li>\n                <li><strong>A Right to Post-Mortem Control of Your Personal Data.</strong> If data protection legislation and related regulations in France are applicable to you, you have the right to establish guidelines for the preservation, the deletion and the transmission of your personal data after your death in accordance with Article 40-1 of the Act No. 78-17 of January 6, 1978 on Information, Technology, Data Files and Civil Liberties; and</li>\n                <li><strong>A Right to Opt-out of Marketing Communications.</strong> You have the right to opt-out of marketing communications we send you at any time. You can exercise this right by clicking on the \u201cunsubscribe\u201d or \u201copt-out\u201d link on any marketing e-mails Galleria sends you. To opt-out of other forms of marketing, please contact us using the contact details provided below.</li>\n              </ul>",
+                        "<div class=\"help-doc-section-title\">13. Change of Ownership or Business Transition</div>",
+                        "In the event of, or in preparation for, a change of ownership or control of Galleria or a business transition such as the sale of Galleria or the sale or license of some or all Galleria\u2019s assets, we may disclose and/or transfer your personal and anonymous data to third-parties who will have the right to continue to collect and use such data in the manner set forth in this Privacy Policy.",
+                        "<div class=\"help-doc-section-title\">14. Security</div>",
+                        "We are committed to ensuring that your data is secure. To prevent unauthorized access, disclosure, or breach, we put in place suitable physical, electronic, and administrative procedures to safeguard and secure the data we collect and process.",
+                        "<div class=\"help-doc-section-title\">15. CONTACT PREFERENCES</div>",
+                        "We may communicate with you through the Service itself, but we may sometimes collect your email address in order to respond to support requests or comments. If you have provided us with your email address and would like to change the email preferences, we associate with you (for example, unsubscribing from receiving certain types of email) you may do so by clicking a link within certain types of emails that we send to you or, if no link is available, by replying with \u201cunsubscribe\u201d in the email title or body or by modifying your email settings within the Service. On rare occasions, some types of email are necessary for the Service and cannot be unsubscribed from if you continue to use the Service.",
+                        "<div class=\"help-doc-section-title\">16. Updates</div>",
+                        "Galleria reserves the right, in its sole discretion, to modify the Privacy Policy at any time (\u201cUpdates\u201d) and shall make Updates available on the Website. You are deemed to accept Updates by continuing to use the Service. Unless Galleria states otherwise, Updates are automatically effective 30 days after posting on the Website.",
+                        "<div class=\"help-doc-section-title\">17. Contact Us</div>",
+                        "If you have requests, questions or comments about the Privacy Policy or our data collection in general, please contact our Data Protection Officer at info@villume.com."
+                    ]
+                }
+            ]
+        },
+        "privacy": {
+            "cards": [
+                {
+                    "isDoc": true,
+                    "title": "Privacy Policy",
+                    "date": "Effective Date: January 2022",
+                    "paragraphs": [
+                        "This Privacy Policy applies to Galleria Media Inc. (\u201cGalleria\u201d, \u201cwe\u201d, \u201cour\u201d or \u201cus\u201d) services, including but not limited to our website villume.com (the \u201cWebsite\u201d), our online art galleries currently titled \u201cVillume\u201d (\u201cVillume\u201d), our social media accounts and online forums, and any other product or service that we choose to apply this Privacy Policy to (collectively, the \u201cService\u201d), and details how we collect, use, and disclose data about our users, including you.",
+                        "<div class=\"help-doc-alert\">BY CLICKING \u201cI AGREE\u201d OR SIMILAR CONFIRMATION OR BY USING THE SERVICE YOU ARE AGREEING TO THE TERMS OF THIS PRIVACY POLICY AS APPLICABLE IN YOUR JURISDICTION.</div>",
+                        "<div class=\"help-doc-section-title\">1. How we obtain your data</div>",
+                        "The Service collects and processes personal data, which is information about you or that identifies you, as well as anonymous data, which does not identify you.",
+                        "We obtain your personal data directly from you or when you use the Service. In many circumstances you may be required to submit personal data in order to access the Service. Your provision of personal data to Galleria is governed by any terms of use, end-user license agreement or similar agreement that we may apply to the Service, which you must agree to in order to use the Service, and this Privacy Policy. If you have any questions or concerns about the disclosure of your personal data please contact us at your convenience using the contact information found below.",
+                        "Subject to legal, contractual and technical requirements, you may choose not to provide Galleria with certain data or request the deletion of certain data, which may impact the Service features available to you or essential operations of the Service",
+                        "<div class=\"help-doc-section-title\">2. Personal data we Collect</div>",
+                        "The following is a description of the personal data that we may collect, use and process in connection with the Service:\n              <ul style=\"margin: 8px 0 8px 24px;\">\n                <li>Your full name for the client account;</li>\n                <li>Your email address, should you decide to request communication from us;</li>\n                <li>Any other personal information that you choose to share with us through our social media accounts and online forums;</li>\n              </ul>\n              We also collect anonymous data that does not identify you, including but not limited to responses to anonymous feedback requests, metrics and other types of statistical data, which could be derived from use of the Service and analytical data concerning the Service.",
+                        "<div class=\"help-doc-section-title\">3. Processing of Your Personal and ANONYMOUS data</div>",
+                        "We process your personal and anonymous data primarily for our legitimate business purposes, such as providing the Service to you, to understand your needs and the needs of our users and to improve the quality of the Service and analyze the data we collect. Specifically, these uses include but are not limited to:\n              <ul style=\"margin: 8px 0 8px 24px;\">\n                <li>providing the Service;</li>\n                <li>interacting with you through our social media accounts or profiles and providing customer support and feedback;</li>\n                <li>authenticating users;</li>\n                <li>maintaining and analyzing functionality of Villume and the Service, backing up data, testing and developing new aspects of Villume, researching new features of the Service, updating Villume and the Service and generating reports and data models that we use to improve the Service;</li>\n                <li>supporting the security and integrity of the Service and its users including but not limited to detecting and protecting Villume and other third-parties against error, fraud, theft and other illegal activity or for contractual, legal, regulatory or audit obligations;</li>\n                <li>investigating improper or suspicious activity; and</li>\n                <li>contacting you for various reasons including, but not limited to, user feedback requests or marketing purposes and events, if you previously consented to such contact.</li>\n              </ul>\n              We may disclose your personal and anonymous data to our parent companies, affiliates, subsidiaries, employees and contractors for the same purposes described above. We may also disclose your personal and anonymous data to third-parties, who may be located in a foreign jurisdiction and subject to foreign laws. The situations where we disclose your personal and anonymous information to third-parties include, but are not limited to:\n              <ul style=\"margin: 8px 0 8px 24px;\">\n                <li>processing your information as described above as well as providing and enhancing the Service features;</li>\n                <li>providing customer support and feedback, analyzing the Service functionality and technical issues, tracking use of the Service and generating reports and data models that we use to improve the Service;</li>\n                <li>providing customized, tailored and personalized advertisements to users of the Service; and</li>\n                <li>responding to a request from law enforcement or a government that has asserted its lawful authority to obtain the data or where Galleria has reasonable grounds to believe the data could be useful in the investigation of unlawful activity, complying with a subpoena or warrant or an order made by a court, person or body with jurisdiction to compel the production of data, complying with court rules regarding the production of records and data, defending our rights and the rights of others or providing information to our legal counsel.</li>\n              </ul>",
+                        "<div class=\"help-doc-section-title\">4. THIRD-PARTY SERVICES</div>",
+                        "In accordance with this Policy, we may disclose other personal information to third-parties or service providers in other provinces or foreign countries, where it may be processed, stored, or transferred to a foreign country, with different privacy laws. By submitting your personal information to Galleria, you consent to this transfer, storage, and processing. We strongly recommend that you read each third-party privacy policy carefully before using the Service. Galleria may provide data to third-parties, including Stripe. Please contact us directly using the information found below if you would like to learn more about third-party data practices.",
+                        "<div class=\"help-doc-section-title\">5. Cookies and DIGITAL TRACKING Technologies</div>",
+                        "The Service may use tracking technologies, such as cookies web beacons, JavaScript tags and clear GIFs to collect data about you, such as your IP address and device information. Based on the data collected from the above listed tracking technologies, third-parties may be able to resolve your identity across multiple devices, for example, by matching your IP address, in order to target you based on your behavior. This data is collected, used and disclosed in accordance with the terms of this Privacy Policy and the applicable third-party privacy policies.",
+                        "<div class=\"help-doc-section-title\">6. Obtaining, rectifying and controlling your personal data</div>",
+                        "You may contact Galleria to obtain a copy of any personal data we collected about you, the production of which may be subject to a fee as permitted by applicable law. In addition, you may contact Galleria to correct inaccurate personal data or to complete incomplete personal data.You may be able to opt-out of some or all of the ways in which your personal data is processed, or request the deletion of certain personal data, except where the personal data is necessary or vital:\n              <ul style=\"margin: 8px 0 8px 24px;\">\n                <li>for the performance of contractual obligations, such as the terms of use;</li>\n                <li>to comply with our legal obligations;</li>\n                <li>to protect your interests or those of another person; or</li>\n                <li>for our legitimate interests or the legitimate interests of a third-party, and may do so by removing personal data, if the Service permits such removal, by ceasing your access to Galleria and contacting us using the contact information found below.</li>\n              </ul>",
+                        "<div class=\"help-doc-section-title\">7. Data Storage, Retention and Transfers</div>",
+                        "While Galleria is a Canadian company, the data you provide through the Service may be stored and processed by third parties in countries around the world. You authorize Galleria and third parties acting on our behalf to process your data in any country of their choosing, which may cause your data, including personal and anonymous data, to be subject to privacy protections and legal rights that may not be equivalent to those in your country.",
+                        "Galleria complies with international personal data transfer laws in applicable jurisdictions. For EU residents, Counselling complies with Articles 44\u201349 of the European Union\u2019s General Data Protection Regulation (the \u201cGDPR\u201d). Galleria also follows UK laws equivalent to what is required by the GDPR for all data collected from UK data subjects. Currently, all transfers of personal data to Canada from residents of the EU are covered by an adequacy decision as described in Article 45 of the GDPR.",
+                        "Your personal data is retained until you request its deletion or until Galleria no longer requires such data for the purpose for which it was collected or until required to be deleted by laws applicable in your jurisdiction. Please email us at info@villume.com to delete any personal data we hold.",
+                        "<div class=\"help-doc-section-title\">8. Children</div>",
+                        "Galleria complies with the United States Children\u2019s Online Privacy Protection Act and all other applicable privacy laws and regulations concerning children and the Internet including laws applicable to residents of the EEA. The Service and Villume are not directed to children under the age of 18 and although it may be possible that children below the age of 18 access certain features of the Service, we do not knowingly collect personal data from children under the age of 18 without first obtaining the appropriate parental consent required by law. If we learn that we inadvertently collected personal data from a child under the age of 18, in a jurisdiction where consent of a parent or guardian is required to be collected prior to the collection of such personal data, without first obtaining such appropriate parental consent, we will delete that data as quickly as possible. If you are a parent or guardian of a child under 18, who you believe provided Galleria with personal data without your consent, please contact us at info@villume.com.",
+                        "<div class=\"help-doc-section-title\">9. DO NOT TRACK DISCLOSURE</div>",
+                        "Do Not Track (\u201cDNT\u201d) is a web or device setting that allows users to request that receivers of personal data stop their tracking activities. When you choose to turn on the DNT setting in your browser or device or use alternative consumer choice mechanisms, your browser or device sends a special signal to websites, analytics companies, advertising networks, plug in providers and other web services you encounter to stop tracking your activity. Currently, there are no DNT technology standards and it is possible that there may never be any DNT technology standards. As a result, we do not respond to DNT requests.",
+                        "<div class=\"help-doc-section-title\">10. CALIFORNIA \u201cSHINE THE LIGHT\u201d RIGHT</div>",
+                        "If you are a California resident, California Civil Code \u00a7 1798.83 grants you the right to request our disclosure of the categories of personal information we provided to third parties, and the names and addresses of these third parties, for direct marketing purposes during the preceding calendar year. If you are a California resident and would like to make this request, please contact us using the contact information set forth below.<br>Please note that you may only make this request once per year.",
+                        "<div class=\"help-doc-section-title\">11. YOUR CALIFORNIA PRIVACY RIGHTS</div>",
+                        "If you are a California resident, California Civil Code Section 1798.120 permits you to opt-out of the sale of your personal information to third parties. Currently, Galleria does not sell your personal information to third parties and as such no opt-out of the sale of such personal information is necessary. Although Galleria does not sell your personal information, Galleria does provide a general opt-out right to all of our clients and users as described in our Privacy Policy. Furthermore, as Galleria already complies with Canadian and EU privacy laws, the rights required to be provided by law to Californian residents are provide to all our clients and users. If you have any other questions about our privacy practices, please email us at info@villume.com.",
+                        "<div class=\"help-doc-section-title\">12. European users and rights of european Economic Area residents</div>",
+                        "Galleria has a legitimate interest, as described in Article 6(1)(f) of the GDPR, in collecting your personal data as described in section 2 of this Privacy Policy for the purposes described in detail in section 3 of this Privacy Policy. In addition, when you provide consent to contact you using your email address or when providing us your contact information by linking a third-party Account to our Service, Galleria may contact and communicate with you using this information, pursuant to Article 6(1)(a) of the GDPR.",
+                        "If you are a resident of the European Union, you have certain rights in regard to your personal data. These rights include:\n              <ul style=\"margin: 8px 0 8px 24px;\">\n                <li><strong>A Right of Access.</strong> You have the right to access your personal data that we hold about you free of charge in most circumstances;</li>\n                <li><strong>A Right to Rectification.</strong> If your personal data is inaccurate or incomplete, you can change the information you provided by changing the information yourself on your Account or by contacting Galleria using the email listed below;</li>\n                <li><strong>A Right to Erasure.</strong> You have the right to obtain deletion of personal data concerning you in many cases. Often you can just delete your information by yourself through your Account, but you can also request the deletion by using the contact information found below. Please be careful as the deletion of your data in this manner is permanent and may never be restored;</li>\n                <li><strong>A Right to Object.</strong> If the processing of your personal data is based on legitimate interests according to Article 6(1)(f) of the GDPR, you have the right to object to this processing in most cases. If you object, we will no longer process your personal data unless there are compelling and prevailing legitimate grounds for the processing as described in Article 21 of the GDPR; in particular if the personal data is necessary for the establishment, exercise or defense of legal claims or in the case where the personal data is required for the provision of certain features of the Service, and you still wish to use such features of the Service;</li>\n                <li><strong>A Right to file a Complaint.</strong> You have the right to file a complaint with the appropriate supervisory authority in your jurisdiction;</li>\n                <li><strong>A Right to Restriction of Processing of your Personal Data.</strong> You have the right to obtain restrictions on the processing of your personal data as described in Article 18 of the GDPR;</li>\n                <li><strong>A Right to Personal Data Portability.</strong> You have the right to receive your Personal Data in a structured, commonly used and machine-readable format and have the right to transmit such data to another controller under the conditions described in Article 20 of the GDPR. Although the personal data collected by Galleria is not particularly useful to other companies as the data collected largely relates to your usage of the Service, Galleria will comply will all requests for the portability of your personal data;</li>\n                <li><strong>A Right to Post-Mortem Control of Your Personal Data.</strong> If data protection legislation and related regulations in France are applicable to you, you have the right to establish guidelines for the preservation, the deletion and the transmission of your personal data after your death in accordance with Article 40-1 of the Act No. 78-17 of January 6, 1978 on Information, Technology, Data Files and Civil Liberties; and</li>\n                <li><strong>A Right to Opt-out of Marketing Communications.</strong> You have the right to opt-out of marketing communications we send you at any time. You can exercise this right by clicking on the \u201cunsubscribe\u201d or \u201copt-out\u201d link on any marketing e-mails Galleria sends you. To opt-out of other forms of marketing, please contact us using the contact details provided below.</li>\n              </ul>",
+                        "<div class=\"help-doc-section-title\">13. Change of Ownership or Business Transition</div>",
+                        "In the event of, or in preparation for, a change of ownership or control of Galleria or a business transition such as the sale of Galleria or the sale or license of some or all Galleria\u2019s assets, we may disclose and/or transfer your personal and anonymous data to third-parties who will have the right to continue to collect and use such data in the manner set forth in this Privacy Policy.",
+                        "<div class=\"help-doc-section-title\">14. Security</div>",
+                        "We are committed to ensuring that your data is secure. To prevent unauthorized access, disclosure, or breach, we put in place suitable physical, electronic, and administrative procedures to safeguard and secure the data we collect and process.",
+                        "<div class=\"help-doc-section-title\">15. CONTACT PREFERENCES</div>",
+                        "We may communicate with you through the Service itself, but we may sometimes collect your email address in order to respond to support requests or comments. If you have provided us with your email address and would like to change the email preferences, we associate with you (for example, unsubscribing from receiving certain types of email) you may do so by clicking a link within certain types of emails that we send to you or, if no link is available, by replying with \u201cunsubscribe\u201d in the email title or body or by modifying your email settings within the Service. On rare occasions, some types of email are necessary for the Service and cannot be unsubscribed from if you continue to use the Service.",
+                        "<div class=\"help-doc-section-title\">16. Updates</div>",
+                        "Galleria reserves the right, in its sole discretion, to modify the Privacy Policy at any time (\u201cUpdates\u201d) and shall make Updates available on the Website. You are deemed to accept Updates by continuing to use the Service. Unless Galleria states otherwise, Updates are automatically effective 30 days after posting on the Website.",
+                        "<div class=\"help-doc-section-title\">17. Contact Us</div>",
+                        "If you have requests, questions or comments about the Privacy Policy or our data collection in general, please contact our Data Protection Officer at info@villume.com."
+                    ]
+                }
+            ]
+        }
+    };
+
+    // State Variables
+    let currentView = 'galleries';
+    let searchTimeout = null;
+    let progressInterval = null;
+
+    // Immersive Home & Dashboard Toggles
+    function enterImmersiveHome() {
+      document.body.classList.add('immersive-home');
+      const cubeBtn = document.getElementById('hud-cube-btn');
+      if (cubeBtn) {
+        cubeBtn.classList.remove('active');
+        cubeBtn.setAttribute('title', 'Open Dashboard & Menu');
+      }
+      showToast('VR Immersive Mode: Tap Cube icon below to open dashboard');
+    }
+
+    function exitImmersiveHome() {
+      document.body.classList.remove('immersive-home');
+      const cubeBtn = document.getElementById('hud-cube-btn');
+      if (cubeBtn) {
+        cubeBtn.classList.add('active');
+        cubeBtn.setAttribute('title', 'Hide Dashboard & Menu');
+      }
+      if (currentView === 'home') {
+        currentView = 'galleries';
+        document.querySelectorAll('#dock-left .nav-item').forEach(btn => {
+          btn.classList.toggle('active', btn.getAttribute('data-view') === 'galleries');
+        });
+        document.querySelectorAll('.view-container').forEach(view => {
+          view.classList.remove('active-view');
+        });
+        const galView = document.getElementById('view-galleries');
+        if (galView) galView.classList.add('active-view');
+        const titleEl = document.getElementById('board-title-text');
+        if (titleEl) titleEl.textContent = 'Galleries';
+        const controlsArea = document.getElementById('header-controls-area');
+        if (controlsArea) controlsArea.style.display = 'flex';
+      }
+    }
+
+    function toggleDashboardFromHud() {
+      if (document.body.classList.contains('immersive-home')) {
+        exitImmersiveHome();
+      } else {
+        enterImmersiveHome();
+      }
+    }
+
+    function showDashboardAndSwitch(targetView) {
+      exitImmersiveHome();
+      switchView(targetView);
+    }
+
+    // View Switching
+    function switchView(viewName) {
+      if (viewName === 'home') {
+        enterImmersiveHome();
+        return;
+      } else {
+        exitImmersiveHome();
+      }
+
+      currentView = viewName;
+
+      // Update Dock Buttons
+      document.querySelectorAll('#dock-left .nav-item').forEach(btn => {
+        if (btn.getAttribute('data-view') === viewName) {
+          btn.classList.add('active');
+        } else if (btn.getAttribute('data-view')) {
+          btn.classList.remove('active');
+        }
+      });
+
+      // Update View Containers
+      document.querySelectorAll('.view-container').forEach(view => {
+        view.classList.remove('active-view');
+      });
+
+      const target = document.getElementById('view-' + viewName);
+      if (target) {
+        target.classList.add('active-view');
+      }
+
+      // Update Header Title & Controls
+      const titleEl = document.getElementById('board-title-text');
+      const controlsArea = document.getElementById('header-controls-area');
+      const searchInput = document.getElementById('search-input');
+
+      if (viewName === 'galleries') {
+        titleEl.textContent = 'Galleries';
+        controlsArea.style.display = 'flex';
+        searchInput.placeholder = 'Search Gallery...';
+      } else if (viewName === 'artists') {
+        titleEl.textContent = 'Creators & Artists';
+        controlsArea.style.display = 'flex';
+        searchInput.placeholder = 'Search artist...';
+      } else if (viewName === 'artist-detail') {
+        titleEl.textContent = 'Artist Profile';
+        controlsArea.style.display = 'none';
+      } else if (viewName === 'help') {
+        titleEl.textContent = 'Help & Guides';
+        controlsArea.style.display = 'none';
+        const urlTab = new URLSearchParams(window.location.search).get('tab');
+        selectHelpTab(urlTab && helpTabsData[urlTab] ? urlTab : 'about');
+      } else if (viewName === 'settings') {
+        titleEl.textContent = 'Setting';
+        controlsArea.style.display = 'none';
+        selectSettingTab('navigation');
+      }
+
+      // Update Hash
+      window.location.hash = viewName;
+    }
+
+    // Help Tab Selection
+    function selectHelpTab(tabKey) {
+      const data = helpTabsData[tabKey];
+      if (!data) return;
+
+      document.querySelectorAll('.help-menu-item').forEach(btn => {
+        if (btn.getAttribute('data-tab') === tabKey) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      const contentArea = document.getElementById('help-content-area');
+      if (!contentArea) return;
+
+      // Always reset scroll position to top when switching tabs
+      contentArea.scrollTop = 0;
+
+      if (data.cards) {
+        contentArea.innerHTML = data.cards.map(card => {
+          if (card.isDoc) {
+            return `
+              <div class="help-info-card help-doc-card">
+                <div class="help-doc-header">
+                  <h2 class="help-doc-title">${card.title}</h2>
+                  ${card.date ? `<span class="help-doc-date">${card.date}</span>` : ''}
+                </div>
+                <div class="help-doc-body">
+                  ${card.paragraphs.map(p => `<div>${p}</div>`).join('')}
+                </div>
+              </div>
+            `;
+          }
+          return `
+            <div class="help-info-card">
+              ${card.title ? `<div class="help-card-header">${card.title}</div>` : ''}
+              ${card.img ? `
+              <div class="help-img-wrapper" style="background: ${card.bg || '#181820'};">
+                <img src="${card.img}" alt="${card.alt || ''}" style="${card.style || ''}" />
+              </div>` : ''}
+              <div class="help-text-content">
+                <p>${card.text}</p>
+                ${card.showModalBtn ? `<button class="btn-primary" style="margin-top:16px;" onclick="openControllerModal()"><i class="ph ph-arrows-out"></i> Expand Full Controller Layout</button>` : ''}
+              </div>
+            </div>
+          `;
+        }).join('');
+      } else if (data.doc) {
+        contentArea.innerHTML = `
+          <div class="help-info-card help-doc-card">
+            <div class="help-doc-header">
+              <h2 class="help-doc-title">${data.doc.title}</h2>
+              ${data.doc.date ? `<span class="help-doc-date">${data.doc.date}</span>` : ''}
+            </div>
+            <div class="help-doc-body">
+              ${data.doc.paragraphs.map(p => `<div>${p}</div>`).join('')}
+            </div>
+          </div>
+        `;
+      } else {
+        let mediaHtml = '';
+        if (data.img) {
+          mediaHtml = `
+            <div class="help-img-wrapper" style="background: ${data.bg || '#181820'};">
+              <img src="${data.img}" alt="${data.alt || ''}" style="${data.style || ''}" />
+            </div>`;
+        } else if (data.svg) {
+          mediaHtml = `
+            <div class="help-img-wrapper" style="background: ${data.bg || 'var(--muted)'}; min-height: 200px;">
+              ${data.svg}
+            </div>`;
+        }
+        contentArea.innerHTML = `
+          <div class="help-info-card">
+            ${data.title ? `<div class="help-card-header">${data.title}</div>` : ''}
+            ${mediaHtml}
+            <div class="help-text-content">
+              <p>${data.text}</p>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    // Highlighted Carousel Navigation
+    function slideHighlightCarousel(direction) {
+      const track = document.getElementById('highlighted-carousel-track');
+      if (!track) return;
+      const card = track.querySelector('.media-card');
+      const cardWidth = card ? card.offsetWidth + 20 : 320;
+      track.scrollBy({ left: direction * cardWidth, behavior: 'smooth' });
+      
+      setTimeout(() => {
+        const prevBtn = document.getElementById('highlight-prev-btn');
+        const nextBtn = document.getElementById('highlight-next-btn');
+        if (prevBtn && nextBtn) {
+          if (track.scrollLeft > 20) {
+            prevBtn.classList.add('btn-active-blue');
+            nextBtn.classList.remove('btn-active-blue');
+          } else {
+            prevBtn.classList.remove('btn-active-blue');
+            nextBtn.classList.add('btn-active-blue');
+          }
+        }
+      }, 350);
+    }
+
+    // Search Logic with matching results AND empty state
+    const searchInput = document.getElementById('search-input');
+    const loadingState = document.getElementById('loading-state');
+    const emptyState = document.getElementById('empty-state');
+    const searchQueryText = document.getElementById('search-query-text');
+    const galleriesWrapper = document.getElementById('galleries-wrapper');
+    const loadingPercentage = document.getElementById('loading-percentage');
+
+    searchInput.addEventListener('input', (e) => {
+      const query = e.target.value.trim();
+
+      clearTimeout(searchTimeout);
+      clearInterval(progressInterval);
+
+      if (query.length > 0) {
+        if (currentView === 'galleries' || currentView === 'home') {
+          // Show simulated loading progress
+          galleriesWrapper.style.display = 'none';
+          emptyState.style.display = 'none';
+          loadingState.style.display = 'flex';
+          
+          let progress = 0;
+          loadingPercentage.textContent = '0%';
+          progressInterval = setInterval(() => {
+            progress += 25;
+            if (progress > 100) progress = 100;
+            loadingPercentage.textContent = progress + '%';
+          }, 80);
+
+          searchTimeout = setTimeout(() => {
+            clearInterval(progressInterval);
+            loadingState.style.display = 'none';
+
+            // Filter cards in both Highlighted and Explore sections
+            const highlightCards = document.querySelectorAll('#highlighted-carousel-track .media-card');
+            const exploreCards = document.querySelectorAll('#main-galleries-grid .media-card:not(:last-child)');
+            let highlightMatches = 0;
+            let exploreMatches = 0;
+
+            highlightCards.forEach(card => {
+              const tags = (card.getAttribute('data-tags') || '').toLowerCase();
+              if (tags.includes(query.toLowerCase())) {
+                card.style.display = 'flex';
+                highlightMatches++;
+              } else {
+                card.style.display = 'none';
+              }
+            });
+
+            exploreCards.forEach(card => {
+              const tags = (card.getAttribute('data-tags') || '').toLowerCase();
+              if (tags.includes(query.toLowerCase())) {
+                card.style.display = 'flex';
+                exploreMatches++;
+              } else {
+                card.style.display = 'none';
+              }
+            });
+
+            const totalMatches = highlightMatches + exploreMatches;
+
+            // Show/hide section containers depending on results
+            const sectionHigh = document.getElementById('section-highlighted');
+            const sectionExpl = document.getElementById('section-explore');
+            if (sectionHigh) sectionHigh.style.display = highlightMatches > 0 ? 'block' : 'none';
+            if (sectionExpl) sectionExpl.style.display = exploreMatches > 0 ? 'block' : 'none';
+
+            if (totalMatches > 0) {
+              galleriesWrapper.style.display = 'block';
+              emptyState.style.display = 'none';
+              const counter = document.getElementById('galleries-counter-badge');
+              if (counter) counter.textContent = totalMatches + ' match' + (totalMatches > 1 ? 'es' : '');
+            } else {
+              galleriesWrapper.style.display = 'none';
+              emptyState.style.display = 'flex';
+              searchQueryText.textContent = query;
+            }
+          }, 350);
+
+        } else if (currentView === 'artists') {
+          // Filter artists
+          const artistCards = document.querySelectorAll('#artists-grid-container .artist-card-custom');
+          let matches = 0;
+          artistCards.forEach(card => {
+            const text = card.textContent.toLowerCase();
+            if (text.includes(query.toLowerCase())) {
+              card.style.display = 'flex';
+              matches++;
+            } else {
+              card.style.display = 'none';
+            }
+          });
+          document.getElementById('artists-count-badge').textContent = matches + ' found';
+        }
+
+      } else {
+        // Reset Search
+        loadingState.style.display = 'none';
+        emptyState.style.display = 'none';
+        galleriesWrapper.style.display = 'block';
+        
+        const sectionHigh = document.getElementById('section-highlighted');
+        const sectionExpl = document.getElementById('section-explore');
+        if (sectionHigh) sectionHigh.style.display = 'block';
+        if (sectionExpl) sectionExpl.style.display = 'block';
+
+        document.querySelectorAll('#highlighted-carousel-track .media-card').forEach(card => {
+          card.style.display = 'flex';
+        });
+        document.querySelectorAll('#main-galleries-grid .media-card').forEach(card => {
+          card.style.display = 'flex';
+        });
+        document.querySelectorAll('#artists-grid-container .artist-card-custom').forEach(card => {
+          card.style.display = 'flex';
+        });
+
+        const counter = document.getElementById('galleries-counter-badge');
+        if (counter) counter.textContent = '29 galleries';
+        const artistCounter = document.getElementById('artists-count-badge');
+        if (artistCounter) artistCounter.textContent = '8 featured';
+      }
+    });
+
+    // Filter Dropdown
+    const filterBtn = document.getElementById('filterDropdownBtn');
+    const filterMenu = document.getElementById('filterDropdownMenu');
+    const currentFilterLabel = document.getElementById('current-filter-label');
+
+    filterBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      filterMenu.classList.toggle('show');
+    });
+
+    document.querySelectorAll('.dropdown-item').forEach(item => {
+      item.addEventListener('click', (e) => {
+        const filterVal = item.getAttribute('data-filter');
+        currentFilterLabel.textContent = item.textContent;
+
+        document.querySelectorAll('.dropdown-item').forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+        filterMenu.classList.remove('show');
+
+        // Apply filter across both Highlighted and Explore
+        const highlightCards = document.querySelectorAll('#highlighted-carousel-track .media-card');
+        const exploreCards = document.querySelectorAll('#main-galleries-grid .media-card:not(:last-child)');
+        let visibleCount = 0;
+
+        highlightCards.forEach(card => {
+          const tags = card.getAttribute('data-tags') || '';
+          if (filterVal === 'all' || tags.includes(filterVal)) {
+            card.style.display = 'flex';
+            visibleCount++;
+          } else {
+            card.style.display = 'none';
+          }
+        });
+
+        exploreCards.forEach(card => {
+          const tags = card.getAttribute('data-tags') || '';
+          if (filterVal === 'all' || tags.includes(filterVal)) {
+            card.style.display = 'flex';
+            visibleCount++;
+          } else {
+            card.style.display = 'none';
+          }
+        });
+
+        const counter = document.getElementById('galleries-counter-badge');
+        if (counter) counter.textContent = visibleCount + ' galleries';
+      });
+    });
+
+    document.addEventListener('click', () => {
+      filterMenu.classList.remove('show');
+    });
+
+    // Load More Galleries
+    const loadMoreBtn = document.getElementById('load-more-galleries-btn');
+    loadMoreBtn.addEventListener('click', () => {
+      const extraItems = [
+        { title: "Solaris Resonance", sub: "Interactive Space &bull; Alexandria", tags: "Solaris Resonance Interactive Space Alexandria" },
+        { title: "Quantum Mirage", sub: "Surreal Dimensions &bull; Hokkaido", tags: "Quantum Mirage Surreal Dimensions Hokkaido" },
+        { title: "Ethereal Echo", sub: "Light & Atmosphere &bull; Fjord", tags: "Ethereal Echo Light Atmosphere Fjord" },
+        { title: "Silent Monolith", sub: "Minimalist Sculptures &bull; Brooklyn", tags: "Silent Monolith Minimalist Sculptures Brooklyn" }
+      ];
+
+      const grid = document.getElementById('main-galleries-grid');
+      const comingSoon = grid.lastElementChild;
+
+      extraItems.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'media-card';
+        div.setAttribute('data-tags', item.tags);
+        div.onclick = () => openPrototype(item.title, item.sub, 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80');
+        div.innerHTML = `
+          <div class="media-img-wrap">
+            <span class="status-tag live">LIVE</span>
+            <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80" alt="${item.title}">
+          </div>
+          <div class="media-info">
+            <span class="media-title">${item.title}</span>
+            <span class="media-sub">${item.sub}</span>
+          </div>
+        `;
+        grid.insertBefore(div, comingSoon);
+      });
+
+      loadMoreBtn.style.display = 'none';
+      showToast('All 29 exhibitions loaded');
+    });
+
+    // Theme Management
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+
+    function setTheme(theme) {
+      document.body.setAttribute('data-theme', theme);
+      if (themeIcon) {
+        themeIcon.className = theme === 'light' ? 'ph ph-moon' : 'ph ph-sun-dim';
+      }
+      localStorage.setItem('villume_theme', theme);
+      const darkBtn = document.getElementById('setting-theme-dark');
+      const lightBtn = document.getElementById('setting-theme-light');
+      if (darkBtn && lightBtn) {
+        darkBtn.classList.toggle('active', theme === 'dark');
+        lightBtn.classList.toggle('active', theme === 'light');
+      }
+    }
+
+    if (themeToggleBtn) {
+      themeToggleBtn.addEventListener('click', () => {
+        const current = document.body.getAttribute('data-theme') || 'dark';
+        const next = current === 'dark' ? 'light' : 'dark';
+        setTheme(next);
+      });
+    }
+
+    // Restore saved theme or URL query param
+    const urlParams = new URLSearchParams(window.location.search);
+    const paramTheme = urlParams.get('theme');
+    if (paramTheme && ['light', 'dark'].includes(paramTheme)) {
+      setTheme(paramTheme);
+    } else {
+      const savedTheme = localStorage.getItem('villume_theme');
+      if (savedTheme) {
+        setTheme(savedTheme);
+      }
+    }
+
+    // Settings Split Tabs & Controls
+    let currentMotionMode = 'full';
+    let currentRotationMode = 'snap';
+
+    function switchSettingTab(tabName) {
+      document.querySelectorAll('.setting-nav-btn').forEach(btn => {
+        if (btn.getAttribute('data-panel') === tabName) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      const navPanel = document.getElementById('setting-panel-navigation');
+      const langPanel = document.getElementById('setting-panel-language');
+      if (tabName === 'navigation') {
+        if (navPanel) navPanel.style.display = 'flex';
+        if (langPanel) langPanel.style.display = 'none';
+      } else {
+        if (navPanel) navPanel.style.display = 'none';
+        if (langPanel) langPanel.style.display = 'flex';
+      }
+    }
+
+    function setSettingMotionMode(mode) {
+      currentMotionMode = mode;
+      const fullBtns = document.querySelectorAll('#setting-btn-fullmotion');
+      const comfortBtns = document.querySelectorAll('#setting-btn-comfortmotion');
+      const imgs = document.querySelectorAll('#setting-controller-img');
+      const radiosRows = document.querySelectorAll('#setting-radios-row');
+      const descs = document.querySelectorAll('#setting-motion-desc');
+
+      if (mode === 'full') {
+        fullBtns.forEach(b => b.classList.add('active'));
+        comfortBtns.forEach(b => b.classList.remove('active'));
+        radiosRows.forEach(r => r.style.display = 'flex');
+        imgs.forEach(i => i.src = 'assets/icons/navigation-full-motion.svg');
+        setSettingRotationMode(currentRotationMode);
+      } else {
+        fullBtns.forEach(b => b.classList.remove('active'));
+        comfortBtns.forEach(b => b.classList.add('active'));
+        radiosRows.forEach(r => r.style.display = 'none');
+        imgs.forEach(i => i.src = 'assets/icons/navigation-comfort-motion.svg');
+        descs.forEach(d => {
+          d.textContent = "Comfort motion provides teleportation and segmented movement designed to minimize motion sickness while preserving full spatial awareness within the virtual gallery rooms.";
+        });
+      }
+    }
+
+    function setSettingRotationMode(rotMode) {
+      currentRotationMode = rotMode;
+      const descs = document.querySelectorAll('#setting-motion-desc');
+      const text = rotMode === 'snap'
+        ? "Full motion snap rotation is a navigation mode where rotation occurs in 30-degree increments, providing a segmented turning experience. In this mode, users have complete control over movement and rotation within the gallery room. The movement is designed to replicate real-world walking simulations, enhancing immersion. Additionally, users can interact with artworks by approaching or being approached by them. The control bar can be toggled for a clear view of the gallery room, and the dashboard offers access to all menu options in Villume."
+        : "Smooth motion is a continuous locomotion mode where movement and rotation occur smoothly without snap intervals, designed for experienced VR users seeking seamless continuous movement throughout the gallery space.";
+      descs.forEach(d => d.textContent = text);
+    }
+
+    function selectSettingTab(tabKey) {
+      document.querySelectorAll('#view-settings .help-menu-item').forEach(btn => {
+        if (btn.getAttribute('data-setting-tab') === tabKey) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      const navTab = document.getElementById('setting-tab-navigation');
+      const langTab = document.getElementById('setting-tab-language');
+      if (tabKey === 'navigation') {
+        if (navTab) navTab.style.display = 'flex';
+        if (langTab) langTab.style.display = 'none';
+      } else {
+        if (navTab) navTab.style.display = 'none';
+        if (langTab) langTab.style.display = 'flex';
+      }
+    }
+
+    // Settings Modal Handlers
+    function openSettingsModal() {
+      switchView('settings');
+    }
+
+    function closeSettingsModal() {
+      const modal = document.getElementById('settings-modal');
+      if (modal) modal.classList.remove('show');
+    }
+
+    function updateImmersionSetting(val) {
+      const valEl = document.getElementById('setting-immersion-val');
+      if (valEl) valEl.textContent = val + '%';
+      const bg = document.getElementById('vr-bg');
+      if (bg) bg.style.filter = `blur(${Math.max(10, 40 * (val / 100))}px) brightness(${0.5 + (val / 200)})`;
+    }
+
+    function setBackdropPreset(preset, btn) {
+      if (btn && btn.parentElement) {
+        btn.parentElement.querySelectorAll('.settings-pill').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+      }
+      const bg = document.getElementById('vr-bg');
+      if (bg) {
+        if (preset === 'cyber') {
+          bg.style.backgroundImage = 'radial-gradient(circle at 50% 50%, rgba(30, 20, 60, 0.8), rgba(5, 5, 15, 0.95))';
+        } else if (preset === 'void') {
+          bg.style.backgroundImage = 'radial-gradient(circle at 50% 50%, rgba(15, 15, 20, 0.9), rgba(0, 0, 0, 0.98))';
+        } else {
+          bg.style.backgroundImage = '';
+        }
+      }
+      showToast('Backdrop environment: ' + preset.toUpperCase());
+    }
+
+    function setLocomotionSetting(mode) {
+      setLocomotion(mode);
+      ['teleport', 'fly', 'walk'].forEach(m => {
+        const el = document.getElementById('setting-loco-' + m);
+        if (el) el.classList.toggle('active', m === mode);
+      });
+    }
+
+    function setSnapAngle(deg, btn) {
+      if (btn && btn.parentElement) {
+        btn.parentElement.querySelectorAll('.settings-pill').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+      }
+      showToast('Snap rotation: ' + deg + '°');
+    }
+
+    function applySettingTheme(theme) {
+      setTheme(theme);
+    }
+
+    function updateVolumeSetting(val) {
+      const volEl = document.getElementById('setting-volume-val');
+      if (volEl) volEl.textContent = val + '%';
+    }
+
+    function resetSettingsDefaults() {
+      updateImmersionSetting(80);
+      const immRange = document.getElementById('setting-immersion-range');
+      if (immRange) immRange.value = 80;
+      updateVolumeSetting(70);
+      const volRange = document.getElementById('setting-volume-range');
+      if (volRange) volRange.value = 70;
+      setLocomotionSetting('fly');
+      applySettingTheme('dark');
+      showToast('Settings reset to defaults');
+    }
+
+    // Modal Handlers
+    function openControllerModal() {
+      document.getElementById('controller-modal').classList.add('show');
+    }
+    function closeControllerModal() {
+      document.getElementById('controller-modal').classList.remove('show');
+    }
+
+    // Prototype Overlay Handlers
+    function openPrototype(title, subtitle, bgImage) {
+      const overlay = document.getElementById('prototype-overlay');
+      document.getElementById('proto-hud-title').textContent = title || 'Dark Valley';
+      document.getElementById('proto-hud-sub').textContent = subtitle || 'Spatial Walkthrough';
+
+      overlay.classList.add('active');
+      gsap.fromTo("#prototype-bottom-dock", 
+        { y: 50, opacity: 0 }, 
+        { y: 0, opacity: 1, duration: 0.5, ease: "power3.out" }
+      );
+    }
+    function closePrototype() {
+      document.getElementById('prototype-overlay').classList.remove('active');
+      document.getElementById('prototype-info-drawer').classList.remove('show');
+    }
+    function togglePrototypeInfo() {
+      document.getElementById('prototype-info-drawer').classList.toggle('show');
+    }
+    function setLocomotion(mode) {
+      ['walk', 'fly', 'teleport'].forEach(m => {
+        const el = document.getElementById('loco-' + m);
+        if (el) el.classList.remove('active');
+      });
+      const activeEl = document.getElementById('loco-' + mode);
+      if (activeEl) activeEl.classList.add('active');
+      showToast('Locomotion mode: ' + mode.toUpperCase());
+    }
+
+    // Toast Notification Helper
+    function showToast(msg) {
+      const toast = document.getElementById('toast-notify');
+      toast.textContent = msg;
+      toast.style.display = 'block';
+      setTimeout(() => {
+        toast.style.display = 'none';
+      }, 2500);
+    }
+
+    function copyShareLink() {
+      const input = document.getElementById('share-url-input');
+      input.select();
+      navigator.clipboard.writeText(input.value).then(() => {
+        showToast('Link copied to clipboard!');
+      });
+    }
+
+    // Left Dock Buttons Click Handler
+    document.querySelectorAll('#dock-left .nav-item[data-view]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const view = btn.getAttribute('data-view');
+        switchView(view);
+      });
+    });
+
+    // Hash Navigation support
+    window.addEventListener('DOMContentLoaded', () => {
+      // Animate Main Workspace on entry
+      gsap.fromTo(".fade-up", 
+        { y: 30, opacity: 0, autoAlpha: 0 }, 
+        { y: 0, opacity: 1, autoAlpha: 1, duration: 0.8, stagger: 0.15, ease: "power3.out" }
+      );
+
+      if (new URLSearchParams(window.location.search).has('instant')) {
+        gsap.globalTimeline.seek(10);
+      }
+
+      const hash = window.location.hash.replace('#', '');
+      if (hash === 'settings') {
+        switchView('galleries');
+        openSettingsModal();
+      } else if (hash && ['home', 'galleries', 'artists', 'artist-detail', 'help'].includes(hash)) {
+        switchView(hash);
+      } else {
+        switchView('galleries');
+      }
+
+      const searchParam = new URLSearchParams(window.location.search).get('search');
+      if (searchParam) {
+        searchInput.value = searchParam;
+        searchInput.dispatchEvent(new Event('input'));
+      }
+    });
+  </script>
+</body>
+</html>

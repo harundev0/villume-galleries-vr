@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VR Artwork Preview - Villume VR</title>
+  <link href="assets/css/global.css" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <style>
+    .prototype-page {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .proto-bg-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: brightness(0.65);
+      z-index: 0;
+    }
+
+    .top-canvas-overlay {
+      position: absolute;
+      top: 36px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--glass-bg);
+      backdrop-filter: blur(40px) saturate(140%);
+      -webkit-backdrop-filter: blur(40px) saturate(140%);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: 16px 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      z-index: 10;
+      box-shadow: var(--glass-shadow);
+      text-align: center;
+    }
+
+    .info-modal-drawer {
+      position: absolute;
+      top: 110px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 840px;
+      max-width: 90vw;
+      max-height: calc(100vh - 220px);
+      overflow-y: auto;
+      background: var(--glass-bg);
+      backdrop-filter: blur(48px) saturate(140%);
+      -webkit-backdrop-filter: blur(48px) saturate(140%);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-xl);
+      padding: 32px;
+      z-index: 15;
+      display: none;
+      box-shadow: var(--glass-shadow);
+    }
+    .info-modal-drawer.show {
+      display: block;
+      animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .dock-horizontal {
+      background: var(--glass-bg);
+      backdrop-filter: blur(40px) saturate(140%);
+      -webkit-backdrop-filter: blur(40px) saturate(140%);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      border-radius: var(--radius-full);
+      padding: 10px 22px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      z-index: 20;
+      margin-bottom: 32px;
+    }
+
+    .share-toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #10b981;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: var(--radius-full);
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+      z-index: 2000;
+      display: none;
+    }
+  </style>
+</head>
+<body data-theme="dark">
+
+  <div class="prototype-page">
+    <!-- VR Walkthrough Video -->
+    <video class="proto-bg-video" autoplay loop muted playsinline>
+      <source src="assets/videos/vr-walkthrough.mp4" type="video/mp4">
+    </video>
+
+    <!-- Top Canvas HUD -->
+    <div class="top-canvas-overlay fade-up" id="top-card">
+      <div style="font-size: 20px; font-weight: 700; letter-spacing: -0.4px;">Dark Valley</div>
+      <div style="font-size: 13px; color: var(--muted-foreground);">By Georg Katstaller &bull; Spatial Walkthrough</div>
+    </div>
+
+    <!-- Info Drawer Modal -->
+    <div class="info-modal-drawer" id="info-drawer">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <h2 style="font-size: 20px; font-weight: 700;">Exhibition Details</h2>
+        <button class="nav-item" style="width: 32px; height: 32px;" onclick="toggleInfo()"><i class="ph ph-x"></i></button>
+      </div>
+
+      <!-- Curator Card -->
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; background: var(--muted); border-radius: var(--radius-lg); margin-bottom: 24px;">
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=128&q=80" alt="Curator" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover;">
+          <div>
+            <div style="font-size: 11px; text-transform: uppercase; color: var(--muted-foreground); font-weight: 600;">Curator</div>
+            <div style="font-size: 15px; font-weight: 600;">Esther Howard</div>
+          </div>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button class="nav-item" style="width: 36px; height: 36px; font-size: 16px;" onclick="showToast('Contacting curator...')"><i class="ph ph-chat-circle"></i></button>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 28px; line-height: 1.7; font-size: 14px; color: var(--foreground); opacity: 0.85;">
+        <p>Step inside this fully immersive VR exhibition environment. Navigate freely through spatial architectural rooms, explore handcrafted physical and digital installations, and interact with artworks in real-time stereoscopic depth.</p>
+      </div>
+
+      <!-- Share Section -->
+      <div style="margin-bottom: 28px;">
+        <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">Share Gallery</h4>
+        <div style="display: flex; gap: 10px;">
+          <input type="text" id="share-url-input" value="https://gallery.villume.com/exhibition/dark-valley" readonly style="flex:1; background: var(--muted); border: 1px solid var(--border); border-radius: var(--radius-full); padding: 0 16px; color: var(--foreground); outline: none; font-size: 13px;">
+          <button class="btn-primary" onclick="copyShareLink()"><i class="ph ph-copy"></i> Copy</button>
+        </div>
+      </div>
+
+      <!-- List of Artworks -->
+      <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 14px;">Included Artworks</h4>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+        <div class="media-card" style="padding: 10px;">
+          <div class="media-img-wrap" style="aspect-ratio: 4/3;">
+            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=400&q=80" alt="Dark Valleys">
+          </div>
+          <div class="media-info" style="margin-top: 8px;">
+            <div style="font-size: 11px; color: var(--muted-foreground);">GEORG KATSTALLER</div>
+            <div style="font-size: 13px; font-weight: 600;">Dark Valleys</div>
+          </div>
+        </div>
+
+        <div class="media-card" style="padding: 10px;">
+          <div class="media-img-wrap" style="aspect-ratio: 4/3;">
+            <img src="https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=400&q=80" alt="From Stone to Silicone">
+          </div>
+          <div class="media-info" style="margin-top: 8px;">
+            <div style="font-size: 11px; color: var(--muted-foreground);">VILLUME</div>
+            <div style="font-size: 13px; font-weight: 600;">From Stone to Silicone</div>
+          </div>
+        </div>
+
+        <div class="media-card" style="padding: 10px;">
+          <div class="media-img-wrap" style="aspect-ratio: 4/3;">
+            <img src="https://images.unsplash.com/photo-1549213821-4708d624e1d1?auto=format&fit=crop&w=400&q=80" alt="Stranded">
+          </div>
+          <div class="media-info" style="margin-top: 8px;">
+            <div style="font-size: 11px; color: var(--muted-foreground);">POLINA SHUBKINA</div>
+            <div style="font-size: 13px; font-weight: 600;">Stranded</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VR Bottom Control Dock -->
+    <nav class="dock-horizontal fade-up" id="bottom-dock">
+      <a href="galleries.html" class="nav-item" title="Exit to Galleries"><i class="ph ph-x"></i></a>
+      <div style="width: 1px; height: 20px; background: var(--border-subtle); margin: 0 4px;"></div>
+      <button class="nav-item" onclick="setLocomotion('walk')" id="loco-walk" title="Walk Mode"><i class="ph ph-sneaker"></i></button>
+      <button class="nav-item active" onclick="setLocomotion('fly')" id="loco-fly" title="Fly Mode"><i class="ph ph-paper-plane-tilt"></i></button>
+      <button class="nav-item" onclick="setLocomotion('teleport')" id="loco-teleport" title="Teleport Mode"><i class="ph ph-target"></i></button>
+      <div style="width: 1px; height: 20px; background: var(--border-subtle); margin: 0 4px;"></div>
+      <button class="nav-item" onclick="toggleInfo()" title="Exhibition Info"><i class="ph ph-info"></i></button>
+    </nav>
+  </div>
+
+  <div class="share-toast" id="toast-notify">Notification</div>
+
+  <script>
+    function toggleInfo() {
+      document.getElementById('info-drawer').classList.toggle('show');
+    }
+
+    function setLocomotion(mode) {
+      ['walk', 'fly', 'teleport'].forEach(m => {
+        const el = document.getElementById('loco-' + m);
+        if (el) el.classList.remove('active');
+      });
+      const activeEl = document.getElementById('loco-' + mode);
+      if (activeEl) activeEl.classList.add('active');
+      showToast('Locomotion mode: ' + mode.toUpperCase());
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast-notify');
+      toast.textContent = msg;
+      toast.style.display = 'block';
+      setTimeout(() => {
+        toast.style.display = 'none';
+      }, 2500);
+    }
+
+    function copyShareLink() {
+      const input = document.getElementById('share-url-input');
+      input.select();
+      navigator.clipboard.writeText(input.value).then(() => {
+        showToast('Link copied to clipboard!');
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      gsap.fromTo("#top-card", 
+        { y: -40, opacity: 0, autoAlpha: 0 }, 
+        { y: 0, opacity: 1, autoAlpha: 1, duration: 0.8, ease: "power3.out", delay: 0.2 }
+      );
+      
+      gsap.fromTo("#bottom-dock", 
+        { y: 40, opacity: 0, autoAlpha: 0 }, 
+        { y: 0, opacity: 1, autoAlpha: 1, duration: 0.8, ease: "power3.out", delay: 0.3 }
+      );
+    });
+  </script>
+</body>
+</html>
